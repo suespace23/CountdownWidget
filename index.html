@@ -27,7 +27,7 @@
 
   body {
     margin: 0;
-    background: var(--bg);
+    background: transparent;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     color: var(--text);
   }
@@ -131,20 +131,18 @@
   </div>
 
 <script>
-  // 🔗 REPLACE WITH YOUR MAKE RESPONSE URL
   const DATA_URL = "PASTE_YOUR_MAKE_JSON_URL_HERE";
 
-  let lastRelapse = new Date().toISOString();
-
-  fetch(DATA_URL)
-    .then(r => r.json())
-    .then(data => {
-      lastRelapse = data.lastRelapse;
-      document.getElementById("challenge").textContent = data.name;
-    });
+  let lastRelapse = null;
+  let timerStarted = false;
 
   function update() {
-    const diff = Math.max(0, Math.floor((Date.now() - new Date(lastRelapse)) / 1000));
+    if (!lastRelapse) return;
+
+    const diff = Math.max(
+      0,
+      Math.floor((Date.now() - new Date(lastRelapse)) / 1000)
+    );
 
     const sec = diff % 60;
     const min = Math.floor(diff / 60) % 60;
@@ -162,8 +160,19 @@
     document.getElementById("dayBar").style.width = Math.min(day / 30, 1) * 100 + "%";
   }
 
-  setInterval(update, 1000);
-  update();
+  fetch(DATA_URL)
+    .then(r => r.json())
+    .then(data => {
+      lastRelapse = data.lastRelapse;
+      document.getElementById("challenge").textContent = data.name;
+
+      if (!timerStarted) {
+        timerStarted = true;
+        update();
+        setInterval(update, 1000);
+      }
+    });
 </script>
+
 </body>
 </html>
