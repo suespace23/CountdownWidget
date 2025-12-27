@@ -202,28 +202,30 @@
     document.getElementById("dayBar").style.width = Math.min(day / 30, 1) * 100 + "%";
   }
 
-  fetch(DATA_URL)
-    .then(r => r.json())
-    .then(data => {
-      previousRelapse = lastRelapse;
-      lastRelapse = data.lastRelapse;
+fetch(DATA_URL, {
+  method: "POST"
+})
+  .then(r => r.json())
+  .then(data => {
+    previousRelapse = lastRelapse;
+    lastRelapse = data.lastRelapse;
 
-      document.getElementById("challenge").textContent = data.name;
+    document.getElementById("challenge").textContent = data.name;
 
-      // Pulse ONLY if relapse timestamp changed
-      if (previousRelapse && previousRelapse !== lastRelapse) {
-        const card = document.querySelector(".card");
-        card.classList.remove("pulse");
-        void card.offsetWidth; // force reflow
-        card.classList.add("pulse");
-      }
+    if (previousRelapse && previousRelapse !== lastRelapse) {
+      const card = document.querySelector(".card");
+      card.classList.remove("pulse");
+      void card.offsetWidth;
+      card.classList.add("pulse");
+    }
 
-      if (!timerStarted) {
-        timerStarted = true;
-        update();
-        setInterval(update, 1000);
-      }
-    });
+    if (!timerStarted) {
+      timerStarted = true;
+      update();
+      setInterval(update, 1000);
+    }
+  });
+
 </script>
 
 
