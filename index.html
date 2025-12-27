@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Recovery Countdown</title>
+
+<style>
+  :root {
+    --bg: #ffffff;
+    --card: #f7f7f7;
+    --text: #000000;
+    --subtext: #666;
+    --bar-bg: #e6d9fa;
+    --bar-fill: #9b5cf6;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0b0b;
+      --card: #121212;
+      --text: #ffffff;
+      --subtext: #aaa;
+      --bar-bg: #2a183d;
+      --bar-fill: #9b5cf6;
+    }
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text);
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 20px;
+    max-width: 720px;
+    margin: auto;
+  }
+
+  .title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 18px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+  }
+
+  .unit {
+    text-align: left;
+  }
+
+  .num {
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .label {
+    font-size: 15px;
+    color: var(--subtext);
+    margin-top: 4px;
+  }
+
+  .bar {
+    height: 12px;
+    background: var(--bar-bg);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+
+  .fill {
+    height: 100%;
+    background: var(--bar-fill);
+    width: 0%;
+    border-radius: 6px;
+    transition: width 0.6s ease;
+  }
+
+  .footer {
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--subtext);
+  }
+</style>
+</head>
+
+<body>
+  <div class="card">
+    <div class="title">
+      ☁️ <span id="challenge">Loading…</span>
+    </div>
+
+    <div class="grid">
+      <div class="unit">
+        <div class="num" id="sec">0</div>
+        <div class="label">seconds</div>
+        <div class="bar"><div class="fill" id="secBar"></div></div>
+      </div>
+
+      <div class="unit">
+        <div class="num" id="min">0</div>
+        <div class="label">minutes</div>
+        <div class="bar"><div class="fill" id="minBar"></div></div>
+      </div>
+
+      <div class="unit">
+        <div class="num" id="hr">0</div>
+        <div class="label">hours</div>
+        <div class="bar"><div class="fill" id="hrBar"></div></div>
+      </div>
+
+      <div class="unit">
+        <div class="num" id="day">0</div>
+        <div class="label">days</div>
+        <div class="bar"><div class="fill" id="dayBar"></div></div>
+      </div>
+    </div>
+
+    <div class="footer">Since your last relapse</div>
+  </div>
+
+<script>
+  // 🔗 REPLACE WITH YOUR MAKE RESPONSE URL
+  const DATA_URL = "PASTE_YOUR_MAKE_JSON_URL_HERE";
+
+  let lastRelapse = new Date().toISOString();
+
+  fetch(DATA_URL)
+    .then(r => r.json())
+    .then(data => {
+      lastRelapse = data.lastRelapse;
+      document.getElementById("challenge").textContent = data.name;
+    });
+
+  function update() {
+    const diff = Math.max(0, Math.floor((Date.now() - new Date(lastRelapse)) / 1000));
+
+    const sec = diff % 60;
+    const min = Math.floor(diff / 60) % 60;
+    const hr  = Math.floor(diff / 3600) % 24;
+    const day = Math.floor(diff / 86400);
+
+    document.getElementById("sec").textContent = sec;
+    document.getElementById("min").textContent = min;
+    document.getElementById("hr").textContent  = hr;
+    document.getElementById("day").textContent = day;
+
+    document.getElementById("secBar").style.width = (sec / 60) * 100 + "%";
+    document.getElementById("minBar").style.width = (min / 60) * 100 + "%";
+    document.getElementById("hrBar").style.width  = (hr / 24) * 100 + "%";
+    document.getElementById("dayBar").style.width = Math.min(day / 30, 1) * 100 + "%";
+  }
+
+  setInterval(update, 1000);
+  update();
+</script>
+</body>
+</html>
