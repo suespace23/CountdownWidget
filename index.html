@@ -92,6 +92,31 @@
     font-size: 14px;
     color: var(--subtext);
   }
+
+  .num {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-block;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.num.flip {
+  transform: translateY(-6px);
+  opacity: 0.6;
+}
+
+/* Subtle pulse on reset */
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(155,92,246,0.6); }
+  70%  { box-shadow: 0 0 0 12px rgba(155,92,246,0); }
+  100% { box-shadow: 0 0 0 0 rgba(155,92,246,0); }
+}
+
+.card.pulse {
+  animation: pulse 0.9s ease-out;
+}
+
 </style>
 </head>
 
@@ -134,7 +159,24 @@
   const DATA_URL = "PASTE_YOUR_MAKE_JSON_URL_HERE";
 
   let lastRelapse = null;
+  let previousRelapse = null;
   let timerStarted = false;
+
+  let prevValues = { sec: null, min: null, hr: null, day: null };
+
+  function animateNumber(id, newValue) {
+    const el = document.getElementById(id);
+
+    if (prevValues[id] === newValue) return;
+
+    el.classList.add("flip");
+    setTimeout(() => {
+      el.textContent = newValue;
+      el.classList.remove("flip");
+    }, 120);
+
+    prevValues[id] = newValue;
+  }
 
   function update() {
     if (!lastRelapse) return;
@@ -149,10 +191,10 @@
     const hr  = Math.floor(diff / 3600) % 24;
     const day = Math.floor(diff / 86400);
 
-    document.getElementById("sec").textContent = sec;
-    document.getElementById("min").textContent = min;
-    document.getElementById("hr").textContent  = hr;
-    document.getElementById("day").textContent = day;
+    animateNumber("sec", sec);
+    animateNumber("min", min);
+    animateNumber("hr", hr);
+    animateNumber("day", day);
 
     document.getElementById("secBar").style.width = (sec / 60) * 100 + "%";
     document.getElementById("minBar").style.width = (min / 60) * 100 + "%";
@@ -163,8 +205,18 @@
   fetch(DATA_URL)
     .then(r => r.json())
     .then(data => {
+      previousRelapse = lastRelapse;
       lastRelapse = data.lastRelapse;
+
       document.getElementById("challenge").textContent = data.name;
+
+      // Pulse ONLY if relapse timestamp changed
+      if (previousRelapse && previousRelapse !== lastRelapse) {
+        const card = document.querySelector(".card");
+        card.classList.remove("pulse");
+        void card.offsetWidth; // force reflow
+        card.classList.add("pulse");
+      }
 
       if (!timerStarted) {
         timerStarted = true;
@@ -173,6 +225,7 @@
       }
     });
 </script>
+
 
 </body>
 </html>
