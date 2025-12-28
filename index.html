@@ -134,38 +134,23 @@
       position: relative;
       width: 0.6em;
       text-align: center;
-      overflow: hidden;
-      height: 1.2em;
     }
 
     .digit-inner {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.6s cubic-bezier(0.45, 0.05, 0.55, 0.95), opacity 0.3s;
+      position: relative;
+      display: inline-block;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
     }
 
-    .digit.flipping .digit-inner.old {
-      animation: slideUp 0.6s ease-in-out forwards;
+    .digit.flipping .digit-inner {
+      animation: flipDigit 0.5s ease-in-out;
     }
 
-    .digit.flipping .digit-inner.new {
-      animation: slideDown 0.6s ease-in-out forwards;
-    }
-
-    @keyframes slideUp {
-      0% { transform: translateY(0); opacity: 1; }
-      100% { transform: translateY(-100%); opacity: 0; }
-    }
-
-    @keyframes slideDown {
-      0% { transform: translateY(100%); opacity: 0; }
-      100% { transform: translateY(0); opacity: 1; }
+    @keyframes flipDigit {
+      0% { transform: rotateX(0deg); }
+      50% { transform: rotateX(-90deg); }
+      100% { transform: rotateX(0deg); }
     }
 
     .label {
@@ -175,48 +160,12 @@
     }
 
     .bar {
-      height: 20px;
+      height: 12px;
       background: var(--bar-bg);
-      border-radius: 10px;
+      border-radius: 6px;
       overflow: hidden;
-      margin-top: 10px;
+      margin-top: 8px;
       position: relative;
-    }
-
-    .bar.circle {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: conic-gradient(var(--bar-fill) 0%, var(--bar-bg) 0%);
-      margin: 10px auto 0;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .bar.circle::after {
-      content: '';
-      position: absolute;
-      width: 50px;
-      height: 50px;
-      background: var(--card);
-      border-radius: 50%;
-    }
-
-    .bar.rounded-bar {
-      height: 20px;
-      border-radius: 20px;
-    }
-
-    .bar.thin-bar {
-      height: 8px;
-      border-radius: 4px;
-    }
-
-    .bar.square-bar {
-      height: 20px;
-      border-radius: 4px;
     }
 
     .fill {
@@ -524,32 +473,32 @@
       <div class="unit" id="yearUnit">
         <div class="num-container" id="year"></div>
         <div class="label">years</div>
-        <div class="bar rounded-bar"><div class="fill wave" id="yearBar"></div></div>
+        <div class="bar"><div class="fill" id="yearBar"></div></div>
       </div>
       <div class="unit" id="monthUnit">
         <div class="num-container" id="month"></div>
         <div class="label">months</div>
-        <div class="bar rounded-bar"><div class="fill wave" id="monthBar"></div></div>
+        <div class="bar"><div class="fill" id="monthBar"></div></div>
       </div>
       <div class="unit" id="dayUnit">
         <div class="num-container" id="day"></div>
         <div class="label">days</div>
-        <div class="bar rounded-bar"><div class="fill wave" id="dayBar"></div></div>
+        <div class="bar"><div class="fill" id="dayBar"></div></div>
       </div>
       <div class="unit" id="hrUnit">
         <div class="num-container" id="hr"></div>
         <div class="label">hours</div>
-        <div class="bar rounded-bar"><div class="fill wave" id="hrBar"></div></div>
+        <div class="bar"><div class="fill" id="hrBar"></div></div>
       </div>
       <div class="unit" id="minUnit">
         <div class="num-container" id="min"></div>
         <div class="label">minutes</div>
-        <div class="bar rounded-bar"><div class="fill wave" id="minBar"></div></div>
+        <div class="bar"><div class="fill" id="minBar"></div></div>
       </div>
       <div class="unit" id="secUnit">
         <div class="num-container" id="sec"></div>
         <div class="label">seconds</div>
-        <div class="bar rounded-bar"><div class="fill wave" id="secBar"></div></div>
+        <div class="bar"><div class="fill" id="secBar"></div></div>
       </div>
     </div>
 
@@ -597,18 +546,8 @@
       <div class="setting-group">
         <label>Number Animation</label>
         <select id="numberAnim">
-          <option value="flip">Slide Animation</option>
+          <option value="flip">Flip Clock</option>
           <option value="none">None</option>
-        </select>
-      </div>
-
-      <div class="setting-group">
-        <label>Progress Bar Shape</label>
-        <select id="barShape">
-          <option value="rounded-bar">Rounded Bar (Default)</option>
-          <option value="circle">Circle</option>
-          <option value="thin-bar">Thin Bar</option>
-          <option value="square-bar">Square Bar</option>
         </select>
       </div>
 
@@ -671,7 +610,6 @@
       buttonBg: "#9b5cf6",
       numberAnim: "flip",
       barStyle: "wave",
-      barShape: "rounded-bar",
       borderRadius: "20px",
       fontSize: "40px",
       selectedPalette: 0
@@ -751,7 +689,6 @@
     const buttonColor = document.getElementById('buttonColor');
     const numberAnim = document.getElementById('numberAnim');
     const barStyle = document.getElementById('barStyle');
-    const barShape = document.getElementById('barShape');
     const borderRadius = document.getElementById('borderRadius');
     const fontSize = document.getElementById('fontSize');
 
@@ -777,18 +714,6 @@
       document.querySelectorAll('.fill').forEach(fill => {
         fill.className = 'fill';
         if (e.target.value !== 'smooth') fill.classList.add(e.target.value);
-      });
-    };
-
-    barShape.onchange = (e) => {
-      state.barShape = e.target.value;
-      document.querySelectorAll('.bar').forEach(bar => {
-        bar.className = 'bar';
-        bar.classList.add(e.target.value);
-        const fill = bar.querySelector('.fill');
-        if (fill && state.barStyle !== 'smooth') {
-          fill.classList.add(state.barStyle);
-        }
       });
     };
 
@@ -823,8 +748,8 @@
     function setNumber(containerId, newValue) {
       const container = document.getElementById(containerId);
       const oldValue = prevValues[containerId];
-      const newStr = String(newValue).padStart(2, '0');
-      const oldStr = String(oldValue).padStart(2, '0');
+      const newStr = String(newValue);
+      const oldStr = String(oldValue);
 
       if (oldValue === '' || oldStr.length !== newStr.length) {
         container.innerHTML = '';
@@ -840,19 +765,10 @@
             const digit = container.children[i];
             if (state.numberAnim === 'flip') {
               digit.classList.add('flipping');
-              const oldInner = digit.querySelector('.digit-inner');
-              oldInner.classList.add('old');
-              
-              const newInner = document.createElement('span');
-              newInner.className = 'digit-inner new';
-              newInner.textContent = newStr[i];
-              digit.appendChild(newInner);
-              
               setTimeout(() => {
-                digit.classList.remove('flipping');
-                oldInner.remove();
-                newInner.classList.remove('new');
-              }, 600);
+                digit.querySelector('.digit-inner').textContent = newStr[i];
+                setTimeout(() => digit.classList.remove('flipping'), 500);
+              }, 250);
             } else {
               digit.querySelector('.digit-inner').textContent = newStr[i];
             }
@@ -884,21 +800,10 @@
       const minUnit = document.getElementById("minUnit");
       const secUnit = document.getElementById("secUnit");
 
-      function updateBar(barId, percentage) {
-        const bar = document.getElementById(barId);
-        const parentBar = bar.parentElement;
-        
-        if (parentBar.classList.contains('circle')) {
-          parentBar.style.background = `conic-gradient(var(--bar-fill) ${percentage}%, var(--bar-bg) ${percentage}%)`;
-        } else {
-          bar.style.width = percentage + "%";
-        }
-      }
-
       if (year > 0) {
         yearUnit.classList.add("visible");
         setNumber("year", year);
-        updateBar("yearBar", 100);
+        document.getElementById("yearBar").style.width = "100%";
       } else {
         yearUnit.classList.remove("visible");
       }
@@ -906,7 +811,7 @@
       if (month > 0 || year > 0) {
         monthUnit.classList.add("visible");
         setNumber("month", month);
-        updateBar("monthBar", (month / 12) * 100);
+        document.getElementById("monthBar").style.width = (month / 12) * 100 + "%";
       } else {
         monthUnit.classList.remove("visible");
       }
@@ -914,7 +819,7 @@
       if (day > 0 || month > 0 || year > 0) {
         dayUnit.classList.add("visible");
         setNumber("day", day);
-        updateBar("dayBar", (day / 30) * 100);
+        document.getElementById("dayBar").style.width = (day / 30) * 100 + "%";
       } else {
         dayUnit.classList.remove("visible");
       }
@@ -922,7 +827,7 @@
       if (hr > 0 || day > 0 || month > 0 || year > 0) {
         hrUnit.classList.add("visible");
         setNumber("hr", hr);
-        updateBar("hrBar", (hr / 24) * 100);
+        document.getElementById("hrBar").style.width = (hr / 24) * 100 + "%";
       } else {
         hrUnit.classList.remove("visible");
       }
@@ -930,14 +835,14 @@
       if (min > 0 || hr > 0 || day > 0 || month > 0 || year > 0) {
         minUnit.classList.add("visible");
         setNumber("min", min);
-        updateBar("minBar", (min / 60) * 100);
+        document.getElementById("minBar").style.width = (min / 60) * 100 + "%";
       } else {
         minUnit.classList.remove("visible");
       }
 
       secUnit.classList.add("visible");
       setNumber("sec", sec);
-      updateBar("secBar", (sec / 60) * 100);
+      document.getElementById("secBar").style.width = (sec / 60) * 100 + "%";
     }
 
     function loop() {
