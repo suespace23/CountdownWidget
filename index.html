@@ -185,7 +185,9 @@
     }
 
     fetch(DATA_URL, { method: "POST" })
-      .then(r => r.json())
+      .then(r => r.text())
+.then(t => JSON.parse(t))
+
       .then(data => {
         previousRelapse = lastRelapse;
         lastRelapse = data.lastRelapse;
