@@ -26,26 +26,28 @@
 
     * { box-sizing: border-box; }
 
-    body {
-      margin: 0;
-      background: var(--bg);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: 20px;
-      padding: 24px;
-      max-width: 720px;
-      width: 100%;
-      position: relative;
-    }
+body {
+  margin: 0;
+  background: transparent; /* Ensure the body doesn't have a color */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+.card {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 24px;
+  max-width: 720px;
+  width: 100%;
+  position: relative;
+  /* Add these two lines to ensure no borders or shadows appear */
+  box-shadow: none; 
+  border: none;
+}
 
     .header-row {
       display: flex;
