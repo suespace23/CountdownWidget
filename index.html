@@ -2,857 +2,114 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Recovery Countdown</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Persistent Count Up</title>
+
   <style>
-    :root {
-      --bg: #ffffff;
-      --card: #f7f7f7;
-      --text: #000000;
-      --subtext: #666;
-      --bar-bg: #e6d9fa;
-      --bar-fill: #9b5cf6;
-      --button-bg: #9b5cf6;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0b0b0b;
-        --card: #121212;
-        --text: #ffffff;
-        --subtext: #aaa;
-      }
-    }
-
-    * { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  background: transparent; /* Ensure the body doesn't have a color */
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  color: var(--text);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 20px;
-}
-.card {
-  background: var(--card);
-  border-radius: 20px;
-  padding: 24px;
-  max-width: 720px;
-  width: 100%;
-  position: relative;
-  /* Add these two lines to ensure no borders or shadows appear */
-  box-shadow: none; 
-  border: none;
-}
-
-    .header-row {
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: transparent;
       display: flex;
+      justify-content: center;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 18px;
     }
 
-    .title {
+    .container {
+      text-align: center;
+    }
+
+    .timer {
       display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 22px;
+      gap: 16px;
+      padding: 12px 16px;
+      background: #111;
+      color: #fff;
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+
+    .timer div {
+      text-align: center;
+    }
+
+    .timer span {
+      font-size: 1.5rem;
       font-weight: 600;
-      flex: 1;
     }
 
-    .icon-btn {
-      font-size: 28px;
-      cursor: pointer;
-      user-select: none;
-      padding: 4px;
-      border-radius: 8px;
-      transition: background 0.2s;
-    }
-
-    .icon-btn:hover {
-      background: var(--bar-bg);
-    }
-
-    .settings-btn {
-      font-size: 24px;
-      cursor: pointer;
-      padding: 6px;
-      border-radius: 8px;
-      transition: background 0.2s;
+    .timer small {
+      display: block;
+      font-size: 0.7rem;
       opacity: 0.7;
     }
 
-    .settings-btn:hover {
-      background: var(--bar-bg);
-      opacity: 1;
-    }
-
-    .title input {
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font-size: 22px;
-      font-weight: 600;
-      flex: 1;
-      outline: none;
-      padding: 4px 8px;
-      border-radius: 6px;
-    }
-
-    .title input:focus {
-      background: var(--bar-bg);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 18px;
-    }
-
-    .unit {
-      text-align: left;
-      display: none;
-    }
-
-    .unit.visible {
-      display: block;
-    }
-
-    .num-container {
-      font-size: 40px;
-      font-weight: 700;
-      line-height: 1;
-      display: flex;
-      gap: 2px;
-    }
-
-    .digit {
-      display: inline-block;
-      position: relative;
-      width: 0.6em;
-      text-align: center;
-    }
-
-    .digit-inner {
-      position: relative;
-      display: inline-block;
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      transform-style: preserve-3d;
-    }
-
-    .digit.flipping .digit-inner {
-      animation: flipDigit 0.5s ease-in-out;
-    }
-
-    @keyframes flipDigit {
-      0% { transform: rotateX(0deg); }
-      50% { transform: rotateX(-90deg); }
-      100% { transform: rotateX(0deg); }
-    }
-
-    .label {
-      font-size: 15px;
-      color: var(--subtext);
-      margin-top: 4px;
-    }
-
-    .bar {
-      height: 12px;
-      background: var(--bar-bg);
-      border-radius: 6px;
-      overflow: hidden;
-      margin-top: 8px;
-      position: relative;
-    }
-
-    .fill {
-      height: 100%;
-      background: var(--bar-fill);
-      width: 0%;
-      border-radius: 6px;
-      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-    }
-
-    .fill.wave {
-      background: linear-gradient(90deg, 
-        var(--bar-fill) 0%, 
-        var(--bar-fill) 40%,
-        color-mix(in srgb, var(--bar-fill) 80%, white) 50%,
-        var(--bar-fill) 60%,
-        var(--bar-fill) 100%
-      );
-      background-size: 200% 100%;
-      animation: wave 2s ease-in-out infinite;
-    }
-
-    @keyframes wave {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-    }
-
-    .fill.glow::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 30px;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4));
-      animation: glow 1.5s ease-in-out infinite;
-    }
-
-    @keyframes glow {
-      0%, 100% { opacity: 0; }
-      50% { opacity: 1; }
-    }
-
-    .fill.gradient {
-      background: linear-gradient(90deg, 
-        color-mix(in srgb, var(--bar-fill) 70%, black),
-        var(--bar-fill),
-        color-mix(in srgb, var(--bar-fill) 70%, white)
-      );
-    }
-
-    .fill.shimmer {
-      background: var(--bar-fill);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .fill.shimmer::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
-      animation: shimmer 2s infinite;
-    }
-
-    @keyframes shimmer {
-      0% { left: -100%; }
-      100% { left: 100%; }
-    }
-
-    .fill.pulse-glow {
-      animation: pulseGlow 2s ease-in-out infinite;
-    }
-
-    @keyframes pulseGlow {
-      0%, 100% { 
-        box-shadow: 0 0 5px var(--bar-fill);
-        filter: brightness(1);
-      }
-      50% { 
-        box-shadow: 0 0 15px var(--bar-fill);
-        filter: brightness(1.2);
-      }
-    }
-
-    .footer {
-      margin-top: 16px;
-      font-size: 14px;
-      color: var(--subtext);
-    }
-
     button {
-      margin-top: 18px;
-      padding: 12px 24px;
+      padding: 6px 14px;
+      border-radius: 8px;
       border: none;
-      border-radius: 10px;
-      background: var(--button-bg);
+      background: #2563eb;
       color: white;
-      font-weight: 600;
       cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-      font-size: 15px;
-      width: 100%;
-    }
-
-    button:hover {
-      opacity: 0.9;
-      transform: translateY(-1px);
-    }
-
-    button:active {
-      transform: translateY(0);
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(155, 92, 246, 0.6); }
-      70% { box-shadow: 0 0 0 12px rgba(155, 92, 246, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(155, 92, 246, 0); }
-    }
-
-    .card.pulse {
-      animation: pulse 0.9s ease-out;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.6);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      padding: 20px;
-    }
-
-    .modal.show {
-      display: flex;
-    }
-
-    .modal-content {
-      background: var(--card);
-      border-radius: 16px;
-      padding: 24px;
-      max-width: 500px;
-      width: 100%;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .modal-header h2 {
-      margin: 0;
-      font-size: 20px;
-    }
-
-    .close-btn {
-      font-size: 28px;
-      cursor: pointer;
-      opacity: 0.6;
-      line-height: 1;
-    }
-
-    .close-btn:hover {
-      opacity: 1;
-    }
-
-    .emoji-grid {
-      display: grid;
-      grid-template-columns: repeat(8, 1fr);
-      gap: 8px;
-      max-height: 300px;
-      overflow-y: auto;
-    }
-
-    .emoji-item {
-      font-size: 28px;
-      padding: 8px;
-      cursor: pointer;
-      border-radius: 8px;
-      text-align: center;
-      transition: background 0.2s;
-    }
-
-    .emoji-item:hover {
-      background: var(--bar-bg);
-    }
-
-    .setting-group {
-      margin-bottom: 24px;
-    }
-
-    .setting-group label {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: var(--text);
-    }
-
-    .setting-group select {
-      width: 100%;
-      padding: 10px;
-      border: 2px solid var(--bar-bg);
-      border-radius: 8px;
-      background: var(--bg);
-      color: var(--text);
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    .palette-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .palette-card {
-      padding: 16px;
-      border-radius: 12px;
-      cursor: pointer;
-      border: 3px solid transparent;
-      transition: all 0.3s;
-    }
-
-    .palette-card:hover {
-      transform: translateY(-2px);
-    }
-
-    .palette-card.selected {
-      border-color: var(--text);
-    }
-
-    .palette-name {
-      font-weight: 600;
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
-
-    .palette-colors {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 4px;
-    }
-
-    .palette-dot {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-    }
-
-    .color-inputs {
-      display: grid;
-      gap: 12px;
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid var(--bar-bg);
-    }
-
-    .color-input-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .color-input-row label {
-      flex: 1;
-      font-size: 13px;
-      margin: 0;
-    }
-
-    .color-input-row input[type="color"] {
-      width: 50px;
-      height: 35px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
+      font-size: 0.9rem;
     }
   </style>
 </head>
+
 <body>
-  <div class="card">
-    <div class="header-row">
-      <div class="title">
-        <span class="icon-btn" id="iconBtn">☁️</span>
-        <input type="text" id="titleInput" value="Negative Thoughts" placeholder="Enter name...">
-      </div>
-      <span class="settings-btn" id="settingsBtn">⚙️</span>
+  <div class="container">
+    <div class="timer" id="timer">
+      <div><span id="months">0</span><small>Months</small></div>
+      <div><span id="days">0</span><small>Days</small></div>
+      <div><span id="hours">0</span><small>Hours</small></div>
+      <div><span id="minutes">0</span><small>Minutes</small></div>
+      <div><span id="seconds">0</span><small>Seconds</small></div>
     </div>
 
-    <div class="grid">
-      <div class="unit" id="yearUnit">
-        <div class="num-container" id="year"></div>
-        <div class="label">years</div>
-        <div class="bar"><div class="fill" id="yearBar"></div></div>
-      </div>
-      <div class="unit" id="monthUnit">
-        <div class="num-container" id="month"></div>
-        <div class="label">months</div>
-        <div class="bar"><div class="fill" id="monthBar"></div></div>
-      </div>
-      <div class="unit" id="dayUnit">
-        <div class="num-container" id="day"></div>
-        <div class="label">days</div>
-        <div class="bar"><div class="fill" id="dayBar"></div></div>
-      </div>
-      <div class="unit" id="hrUnit">
-        <div class="num-container" id="hr"></div>
-        <div class="label">hours</div>
-        <div class="bar"><div class="fill" id="hrBar"></div></div>
-      </div>
-      <div class="unit" id="minUnit">
-        <div class="num-container" id="min"></div>
-        <div class="label">minutes</div>
-        <div class="bar"><div class="fill" id="minBar"></div></div>
-      </div>
-      <div class="unit" id="secUnit">
-        <div class="num-container" id="sec"></div>
-        <div class="label">seconds</div>
-        <div class="bar"><div class="fill" id="secBar"></div></div>
-      </div>
-    </div>
-
-    <div class="footer">Since your last relapse</div>
-    <button id="btn">Start Counting</button>
-  </div>
-
-  <div class="modal" id="emojiModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Choose Icon</h2>
-        <span class="close-btn" id="closeEmoji">×</span>
-      </div>
-      <div class="emoji-grid" id="emojiGrid"></div>
-    </div>
-  </div>
-
-  <div class="modal" id="settingsModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Settings</h2>
-        <span class="close-btn" id="closeSettings">×</span>
-      </div>
-
-      <div class="setting-group">
-        <label>Color Palette</label>
-        <div class="palette-grid" id="paletteGrid"></div>
-        
-        <div class="color-inputs">
-          <div class="color-input-row">
-            <label>Progress Background</label>
-            <input type="color" id="barBgColor" value="#e6d9fa">
-          </div>
-          <div class="color-input-row">
-            <label>Progress Fill</label>
-            <input type="color" id="barFillColor" value="#9b5cf6">
-          </div>
-          <div class="color-input-row">
-            <label>Button</label>
-            <input type="color" id="buttonColor" value="#9b5cf6">
-          </div>
-        </div>
-      </div>
-
-      <div class="setting-group">
-        <label>Number Animation</label>
-        <select id="numberAnim">
-          <option value="flip">Flip Clock</option>
-          <option value="none">None</option>
-        </select>
-      </div>
-
-      <div class="setting-group">
-        <label>Progress Bar Style</label>
-        <select id="barStyle">
-          <option value="wave">Wave</option>
-          <option value="glow">Glow</option>
-          <option value="gradient">Gradient</option>
-          <option value="shimmer">Shimmer</option>
-          <option value="pulse-glow">Pulse Glow</option>
-          <option value="smooth">Simple</option>
-        </select>
-      </div>
-
-      <div class="setting-group">
-        <label>Card Corner Radius</label>
-        <select id="borderRadius">
-          <option value="20px">Rounded (Default)</option>
-          <option value="8px">Slightly Rounded</option>
-          <option value="0px">Square</option>
-          <option value="30px">Very Rounded</option>
-        </select>
-      </div>
-
-      <div class="setting-group">
-        <label>Font Size</label>
-        <select id="fontSize">
-          <option value="40px">Normal (Default)</option>
-          <option value="32px">Small</option>
-          <option value="48px">Large</option>
-          <option value="56px">Extra Large</option>
-        </select>
-      </div>
-    </div>
+    <button id="startBtn">Start Timer</button>
   </div>
 
   <script>
-    const emojis = ['☁️','💭','🧠','💪','🎯','⭐','🌟','✨','🔥','💎','🏆','❤️','💚','💙','💜','🌈','🦋','🌸','🌺','🌻','🌹','🌷','🍀','🌿','🌱','🎨','🎭','🎪','🎬','🎮','🎯','🎲','🎰','🎻','🎸','🎺','🎷','🎼','🎵','🎶','☀️','🌙','⭐','🌟','💫','✨','🌍','🌎','🌏','🗺️','🧭','⛰️','🏔️','🗻','🌋','🏕️','🏖️','🏝️','🏜️','🏞️','🏟️'];
+    const params = new URLSearchParams(window.location.search);
+    let startTime = params.get("start")
+      ? new Date(Number(params.get("start")))
+      : null;
 
-    const palettes = [
-      { name: 'Purple Dream', barBg: '#e6d9fa', barFill: '#9b5cf6', button: '#9b5cf6' },
-      { name: 'Pink Paradise', barBg: '#ffd3e1', barFill: '#ff6b9d', button: '#ff4081' },
-      { name: 'Ocean Blue', barBg: '#d3e9ff', barFill: '#4a90e2', button: '#2e7dd9' },
-      { name: 'Mint Fresh', barBg: '#d3f5e6', barFill: '#4ecdc4', button: '#3ab8af' },
-      { name: 'Sunset Orange', barBg: '#ffe5d3', barFill: '#ff8a5b', button: '#ff6b35' },
-      { name: 'Golden Hour', barBg: '#fff4d3', barFill: '#ffd93d', button: '#ffc107' },
-      { name: 'Forest Green', barBg: '#d8f3dc', barFill: '#52b788', button: '#40916c' },
-      { name: 'Lavender Dream', barBg: '#e8d9f5', barFill: '#b084cc', button: '#9b59b6' },
-      { name: 'Rose Gold', barBg: '#fde8e9', barFill: '#e8a0a6', button: '#d87c82' },
-      { name: 'Coral Reef', barBg: '#ffe8e1', barFill: '#ff8f7a', button: '#ff6b54' }
-    ];
+    const startBtn = document.getElementById("startBtn");
 
-    let state = {
-      start: null,
-      title: "Negative Thoughts",
-      icon: "☁️",
-      barBg: "#e6d9fa",
-      barFill: "#9b5cf6",
-      buttonBg: "#9b5cf6",
-      numberAnim: "flip",
-      barStyle: "wave",
-      borderRadius: "20px",
-      fontSize: "40px",
-      selectedPalette: 0
-    };
-
-    const btn = document.getElementById("btn");
-    const titleInput = document.getElementById("titleInput");
-    const iconBtn = document.getElementById("iconBtn");
-    const settingsBtn = document.getElementById("settingsBtn");
-    const card = document.querySelector(".card");
-    const emojiModal = document.getElementById("emojiModal");
-    const settingsModal = document.getElementById("settingsModal");
-    const emojiGrid = document.getElementById("emojiGrid");
-    const paletteGrid = document.getElementById("paletteGrid");
-
-    let prevValues = { year: '', month: '', day: '', hr: '', min: '', sec: '' };
-
-    emojis.forEach(emoji => {
-      const div = document.createElement('div');
-      div.className = 'emoji-item';
-      div.textContent = emoji;
-      div.onclick = () => {
-        state.icon = emoji;
-        iconBtn.textContent = emoji;
-        emojiModal.classList.remove('show');
-      };
-      emojiGrid.appendChild(div);
+    startBtn.addEventListener("click", () => {
+      const now = Date.now();
+      // Persist start time in URL
+      window.location.search = `?start=${now}`;
     });
 
-    palettes.forEach((palette, idx) => {
-      const div = document.createElement('div');
-      div.className = 'palette-card';
-      if (idx === 0) div.classList.add('selected');
-      div.style.background = palette.barBg;
-      div.innerHTML = `
-        <div class="palette-name" style="color: ${palette.button}">${palette.name}</div>
-        <div class="palette-colors">
-          <div class="palette-dot" style="background: ${palette.barBg}"></div>
-          <div class="palette-dot" style="background: ${palette.barFill}"></div>
-          <div class="palette-dot" style="background: ${palette.button}"></div>
-        </div>
-      `;
-      div.onclick = () => {
-        state.selectedPalette = idx;
-        state.barBg = palette.barBg;
-        state.barFill = palette.barFill;
-        state.buttonBg = palette.button;
-        
-        document.documentElement.style.setProperty('--bar-bg', palette.barBg);
-        document.documentElement.style.setProperty('--bar-fill', palette.barFill);
-        document.documentElement.style.setProperty('--button-bg', palette.button);
-        
-        document.getElementById('barBgColor').value = palette.barBg;
-        document.getElementById('barFillColor').value = palette.barFill;
-        document.getElementById('buttonColor').value = palette.button;
-        
-        document.querySelectorAll('.palette-card').forEach(c => c.classList.remove('selected'));
-        div.classList.add('selected');
-      };
-      paletteGrid.appendChild(div);
-    });
+    function updateTimer() {
+      if (!startTime) return;
 
-    iconBtn.onclick = () => emojiModal.classList.add('show');
-    settingsBtn.onclick = () => settingsModal.classList.add('show');
-    document.getElementById('closeEmoji').onclick = () => emojiModal.classList.remove('show');
-    document.getElementById('closeSettings').onclick = () => settingsModal.classList.remove('show');
+      const now = new Date();
+      let diff = now - startTime;
 
-    emojiModal.onclick = (e) => {
-      if (e.target === emojiModal) emojiModal.classList.remove('show');
-    };
-    settingsModal.onclick = (e) => {
-      if (e.target === settingsModal) settingsModal.classList.remove('show');
-    };
+      if (diff < 0) diff = 0;
 
-    const barBgColor = document.getElementById('barBgColor');
-    const barFillColor = document.getElementById('barFillColor');
-    const buttonColor = document.getElementById('buttonColor');
-    const numberAnim = document.getElementById('numberAnim');
-    const barStyle = document.getElementById('barStyle');
-    const borderRadius = document.getElementById('borderRadius');
-    const fontSize = document.getElementById('fontSize');
+      const seconds = Math.floor(diff / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const daysTotal = Math.floor(hours / 24);
 
-    barBgColor.oninput = (e) => {
-      state.barBg = e.target.value;
-      document.documentElement.style.setProperty('--bar-bg', e.target.value);
-    };
+      const months = Math.floor(daysTotal / 30);
+      const days = daysTotal % 30;
 
-    barFillColor.oninput = (e) => {
-      state.barFill = e.target.value;
-      document.documentElement.style.setProperty('--bar-fill', e.target.value);
-    };
+      document.getElementById("months").textContent = months;
+      document.getElementById("days").textContent = days;
+      document.getElementById("hours").textContent = hours % 24;
+      document.getElementById("minutes").textContent = minutes % 60;
+      document.getElementById("seconds").textContent = seconds % 60;
 
-    buttonColor.oninput = (e) => {
-      state.buttonBg = e.target.value;
-      document.documentElement.style.setProperty('--button-bg', e.target.value);
-    };
-
-    numberAnim.onchange = (e) => state.numberAnim = e.target.value;
-    
-    barStyle.onchange = (e) => {
-      state.barStyle = e.target.value;
-      document.querySelectorAll('.fill').forEach(fill => {
-        fill.className = 'fill';
-        if (e.target.value !== 'smooth') fill.classList.add(e.target.value);
-      });
-    };
-
-    borderRadius.onchange = (e) => {
-      state.borderRadius = e.target.value;
-      card.style.borderRadius = e.target.value;
-    };
-
-    fontSize.onchange = (e) => {
-      state.fontSize = e.target.value;
-      document.querySelectorAll('.num-container').forEach(num => num.style.fontSize = e.target.value);
-    };
-
-    titleInput.oninput = () => {
-      state.title = titleInput.value;
-    };
-
-    btn.onclick = () => {
-      if (state.start) {
-        state.start = null;
-        btn.textContent = "Start Counting";
-        document.querySelectorAll('.unit').forEach(u => u.classList.remove('visible'));
-      } else {
-        state.start = Date.now();
-        btn.textContent = "Reset Counter";
-        card.classList.remove("pulse");
-        void card.offsetWidth;
-        card.classList.add("pulse");
-      }
-    };
-
-    function setNumber(containerId, newValue) {
-      const container = document.getElementById(containerId);
-      const oldValue = prevValues[containerId];
-      const newStr = String(newValue);
-      const oldStr = String(oldValue);
-
-      if (oldValue === '' || oldStr.length !== newStr.length) {
-        container.innerHTML = '';
-        for (let i = 0; i < newStr.length; i++) {
-          const digit = document.createElement('span');
-          digit.className = 'digit';
-          digit.innerHTML = `<span class="digit-inner">${newStr[i]}</span>`;
-          container.appendChild(digit);
-        }
-      } else {
-        for (let i = 0; i < newStr.length; i++) {
-          if (oldStr[i] !== newStr[i]) {
-            const digit = container.children[i];
-            if (state.numberAnim === 'flip') {
-              digit.classList.add('flipping');
-              setTimeout(() => {
-                digit.querySelector('.digit-inner').textContent = newStr[i];
-                setTimeout(() => digit.classList.remove('flipping'), 500);
-              }, 250);
-            } else {
-              digit.querySelector('.digit-inner').textContent = newStr[i];
-            }
-          }
-        }
-      }
-
-      prevValues[containerId] = newValue;
+      startBtn.style.display = "none";
     }
 
-    function update() {
-      if (!state.start) return;
-
-      const diff = Math.max(0, Math.floor((Date.now() - state.start) / 1000));
-
-      const sec = diff % 60;
-      const min = Math.floor(diff / 60) % 60;
-      const hr = Math.floor(diff / 3600) % 24;
-      const totalDays = Math.floor(diff / 86400);
-      const day = totalDays % 30;
-      const totalMonths = Math.floor(totalDays / 30);
-      const month = totalMonths % 12;
-      const year = Math.floor(totalMonths / 12);
-
-      const yearUnit = document.getElementById("yearUnit");
-      const monthUnit = document.getElementById("monthUnit");
-      const dayUnit = document.getElementById("dayUnit");
-      const hrUnit = document.getElementById("hrUnit");
-      const minUnit = document.getElementById("minUnit");
-      const secUnit = document.getElementById("secUnit");
-
-      if (year > 0) {
-        yearUnit.classList.add("visible");
-        setNumber("year", year);
-        document.getElementById("yearBar").style.width = "100%";
-      } else {
-        yearUnit.classList.remove("visible");
-      }
-
-      if (month > 0 || year > 0) {
-        monthUnit.classList.add("visible");
-        setNumber("month", month);
-        document.getElementById("monthBar").style.width = (month / 12) * 100 + "%";
-      } else {
-        monthUnit.classList.remove("visible");
-      }
-
-      if (day > 0 || month > 0 || year > 0) {
-        dayUnit.classList.add("visible");
-        setNumber("day", day);
-        document.getElementById("dayBar").style.width = (day / 30) * 100 + "%";
-      } else {
-        dayUnit.classList.remove("visible");
-      }
-
-      if (hr > 0 || day > 0 || month > 0 || year > 0) {
-        hrUnit.classList.add("visible");
-        setNumber("hr", hr);
-        document.getElementById("hrBar").style.width = (hr / 24) * 100 + "%";
-      } else {
-        hrUnit.classList.remove("visible");
-      }
-
-      if (min > 0 || hr > 0 || day > 0 || month > 0 || year > 0) {
-        minUnit.classList.add("visible");
-        setNumber("min", min);
-        document.getElementById("minBar").style.width = (min / 60) * 100 + "%";
-      } else {
-        minUnit.classList.remove("visible");
-      }
-
-      secUnit.classList.add("visible");
-      setNumber("sec", sec);
-      document.getElementById("secBar").style.width = (sec / 60) * 100 + "%";
-    }
-
-    function loop() {
-      update();
-      requestAnimationFrame(loop);
-    }
-
-    loop();
+    updateTimer();
+    setInterval(updateTimer, 1000);
   </script>
 </body>
 </html>
