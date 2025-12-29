@@ -1,297 +1,1507 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Persistent Notion Timer</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --card: #f7f7f7;
+      --text: #000000;
+      --subtext: #666;
+      --bar-bg: #e6d9fa;
+      --bar-fill: #9b5cf6;
+      --button-bg: #9b5cf6;
+    }
 
-<title>Persistent Notion Timer</title>
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0b0b0b;
+        --card: #121212;
+        --text: #ffffff;
+        --subtext: #aaa;
+      }
+    }
 
-<style>
-:root {
-  --accent: #a855f7;
-  --bg-dark: #0b0b0c;
-  --bg-light: #ffffff;
-  --text-dark: #ffffff;
-  --text-light: #000000;
-  --muted-dark: #9ca3af;
-  --muted-light: #6b7280;
-  --bar-bg-dark: #2a1438;
-  --bar-bg-light: #e9d5ff;
-}
+    * { box-sizing: border-box; }
 
-/* ===== AUTO DARK MODE (Notion) ===== */
-@media (prefers-color-scheme: dark) {
-  body {
-    --bg: var(--bg-dark);
-    --text: var(--text-dark);
-    --muted: var(--muted-dark);
-    --bar-bg: var(--bar-bg-dark);
-  }
-}
-@media (prefers-color-scheme: light) {
-  body {
-    --bg: var(--bg-light);
-    --text: var(--text-light);
-    --muted: var(--muted-light);
-    --bar-bg: var(--bar-bg-light);
-  }
-}
+    body {
+      margin: 0;
+      background: var(--bg);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 12px;
+    }
 
-body {
-  margin: 0;
-  padding: 16px;
-  background: transparent;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-}
+    .card {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 24px 20px 20px;
+      width: 100%;
+      max-width: 100%;
+      position: relative;
+    }
 
-.card {
-  background: var(--bg);
-  color: var(--text);
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
-  max-width: 640px;
-}
+    @media (min-width: 640px) {
+      .card {
+        padding: 28px 24px 24px;
+      }
+    }
 
-/* ===== HEADER ===== */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+    @media (min-width: 768px) {
+      .card {
+        padding: 32px 24px 24px;
+        max-width: 720px;
+      }
+    }
 
-.title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 20px;
-  font-weight: 600;
-}
+    .loading {
+      opacity: 0.5;
+      pointer-events: none;
+    }
 
-.title span {
-  cursor: pointer;
-}
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
 
-.icons {
-  display: flex;
-  gap: 10px;
-}
+    @media (min-width: 640px) {
+      .header-row {
+        margin-bottom: 24px;
+      }
+    }
 
-.icon-btn {
-  cursor: pointer;
-  opacity: 0.7;
-}
-.icon-btn:hover { opacity: 1; }
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: 600;
+      flex: 1;
+      min-width: 0;
+    }
 
-/* ===== STATS ===== */
-.stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
-  margin-top: 20px;
-}
+    @media (min-width: 640px) {
+      .title {
+        gap: 10px;
+        font-size: 20px;
+      }
+    }
 
-.stat {
-  text-align: left;
-}
+    .icon-btn {
+      font-size: 22px;
+      cursor: pointer;
+      user-select: none;
+      padding: 4px;
+      border-radius: 8px;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
 
-.stat-value {
-  font-size: 32px;
-  font-weight: 700;
-}
+    @media (min-width: 640px) {
+      .icon-btn {
+        font-size: 24px;
+      }
+    }
 
-.stat-label {
-  font-size: 14px;
-  color: var(--muted);
-}
+    .icon-btn:hover {
+      background: var(--bar-bg);
+    }
 
-.bar {
-  background: var(--bar-bg);
-  height: 10px;
-  border-radius: 999px;
-  overflow: hidden;
-  margin-top: 6px;
-}
+    .settings-btn {
+      font-size: 18px;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 8px;
+      transition: all 0.2s;
+      opacity: 0.4;
+      flex-shrink: 0;
+    }
 
-.bar-fill {
-  background: var(--accent);
-  height: 100%;
-  width: 0%;
-  transition: width 0.6s ease;
-}
+    @media (min-width: 640px) {
+      .settings-btn {
+        font-size: 20px;
+      }
+    }
 
-/* ===== FOOTER ===== */
-.footer {
-  margin-top: 18px;
-  color: var(--muted);
-  font-size: 14px;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  padding-top: 14px;
-}
+    .settings-btn:hover {
+      background: var(--bar-bg);
+      opacity: 0.8;
+    }
 
-/* ===== MODAL ===== */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
+    .title input {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 600;
+      flex: 1;
+      min-width: 0;
+      outline: none;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
 
-.modal-content {
-  background: var(--bg);
-  color: var(--text);
-  padding: 20px;
-  border-radius: 16px;
-  width: 300px;
-}
+    @media (min-width: 640px) {
+      .title input {
+        font-size: 20px;
+      }
+    }
 
-.modal h3 {
-  margin-top: 0;
-}
+    .title input:focus {
+      background: var(--bar-bg);
+    }
 
-.color-options span,
-.icon-options span {
-  cursor: pointer;
-  padding: 6px;
-  display: inline-block;
-  font-size: 20px;
-}
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 16px;
+      margin-bottom: 8px;
+    }
 
-.color-options span {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-}
+    @media (min-width: 480px) {
+      .grid {
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 18px;
+      }
+    }
 
-</style>
+    @media (min-width: 640px) {
+      .grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 20px;
+      }
+    }
+
+    .unit {
+      text-align: left;
+      display: none;
+    }
+
+    .unit.visible {
+      display: block;
+    }
+
+    .num-container {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1;
+      display: flex;
+      gap: 2px;
+    }
+
+    @media (min-width: 480px) {
+      .num-container {
+        font-size: 36px;
+      }
+    }
+
+    @media (min-width: 640px) {
+      .num-container {
+        font-size: 40px;
+      }
+    }
+
+    .digit {
+      display: inline-block;
+      position: relative;
+      width: 0.6em;
+      text-align: center;
+      overflow: hidden;
+      height: 1.2em;
+    }
+
+    .digit-inner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.6s cubic-bezier(0.45, 0.05, 0.55, 0.95), opacity 0.3s;
+    }
+
+    .digit.flipping .digit-inner.old {
+      animation: slideUp 0.6s ease-in-out forwards;
+    }
+
+    .digit.flipping .digit-inner.new {
+      animation: slideDown 0.6s ease-in-out forwards;
+    }
+
+    @keyframes slideUp {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-100%); opacity: 0; }
+    }
+
+    @keyframes slideDown {
+      0% { transform: translateY(100%); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    .label {
+      font-size: 13px;
+      color: var(--subtext);
+      margin-top: 4px;
+    }
+
+    @media (min-width: 640px) {
+      .label {
+        font-size: 15px;
+      }
+    }
+
+    .bar {
+      height: 16px;
+      background: var(--bar-bg);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 8px;
+      position: relative;
+    }
+
+    @media (min-width: 640px) {
+      .bar {
+        height: 20px;
+        margin-top: 10px;
+      }
+    }
+
+    .bar.circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: conic-gradient(var(--bar-fill) 0%, var(--bar-bg) 0%);
+      margin: 8px auto 0;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (min-width: 640px) {
+      .bar.circle {
+        width: 70px;
+        height: 70px;
+        margin: 10px auto 0;
+      }
+    }
+
+    .bar.circle::after {
+      content: '';
+      position: absolute;
+      width: 42px;
+      height: 42px;
+      background: var(--card);
+      border-radius: 50%;
+    }
+
+    @media (min-width: 640px) {
+      .bar.circle::after {
+        width: 50px;
+        height: 50px;
+      }
+    }
+
+    .bar.rounded-bar {
+      height: 16px;
+      border-radius: 20px;
+    }
+
+    @media (min-width: 640px) {
+      .bar.rounded-bar {
+        height: 20px;
+      }
+    }
+
+    .bar.thin-bar {
+      height: 6px;
+      border-radius: 4px;
+    }
+
+    @media (min-width: 640px) {
+      .bar.thin-bar {
+        height: 8px;
+      }
+    }
+
+    .bar.square-bar {
+      height: 16px;
+      border-radius: 4px;
+    }
+
+    @media (min-width: 640px) {
+      .bar.square-bar {
+        height: 20px;
+      }
+    }
+
+    .fill {
+      height: 100%;
+      background: var(--bar-fill);
+      width: 0%;
+      border-radius: 6px;
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .fill.wave {
+      background: linear-gradient(90deg, 
+        var(--bar-fill) 0%, 
+        var(--bar-fill) 40%,
+        color-mix(in srgb, var(--bar-fill) 80%, white) 50%,
+        var(--bar-fill) 60%,
+        var(--bar-fill) 100%
+      );
+      background-size: 200% 100%;
+      animation: wave 2s ease-in-out infinite;
+    }
+
+    @keyframes wave {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .fill.glow::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 30px;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4));
+      animation: glow 1.5s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
+
+    .fill.gradient {
+      background: linear-gradient(90deg, 
+        color-mix(in srgb, var(--bar-fill) 70%, black),
+        var(--bar-fill),
+        color-mix(in srgb, var(--bar-fill) 70%, white)
+      );
+    }
+
+    .fill.shimmer {
+      background: var(--bar-fill);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fill.shimmer::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    .fill.pulse-glow {
+      animation: pulseGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { 
+        box-shadow: 0 0 5px var(--bar-fill);
+        filter: brightness(1);
+      }
+      50% { 
+        box-shadow: 0 0 15px var(--bar-fill);
+        filter: brightness(1.2);
+      }
+    }
+
+    .footer {
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--subtext);
+      gap: 12px;
+    }
+
+    @media (min-width: 640px) {
+      .footer {
+        margin-top: 20px;
+        font-size: 13px;
+      }
+    }
+
+    .footer span {
+      flex-shrink: 0;
+    }
+
+    .action-btn {
+      padding: 7px 16px;
+      border: 1.5px solid var(--bar-fill);
+      border-radius: 20px;
+      background: transparent;
+      color: var(--bar-fill);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 12px;
+      opacity: 0.7;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    @media (min-width: 640px) {
+      .action-btn {
+        padding: 8px 20px;
+        font-size: 13px;
+      }
+    }
+
+    .action-btn:hover {
+      opacity: 1;
+      background: var(--bar-fill);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    .action-btn:active {
+      transform: translateY(0);
+    }
+
+    .action-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .action-btn.running {
+      border-color: var(--subtext);
+      color: var(--subtext);
+    }
+
+    .action-btn.running:hover {
+      background: var(--subtext);
+      color: white;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(155, 92, 246, 0.6); }
+      70% { box-shadow: 0 0 0 12px rgba(155, 92, 246, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(155, 92, 246, 0); }
+    }
+
+    .card.pulse {
+      animation: pulse 0.9s ease-out;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+
+    @media (min-width: 640px) {
+      .modal {
+        padding: 20px;
+      }
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 20px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    @media (min-width: 640px) {
+      .modal-content {
+        padding: 24px;
+        max-height: 80vh;
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    @media (min-width: 640px) {
+      .modal-header {
+        margin-bottom: 20px;
+      }
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    @media (min-width: 640px) {
+      .modal-header h2 {
+        font-size: 20px;
+      }
+    }
+
+    .close-btn {
+      font-size: 28px;
+      cursor: pointer;
+      opacity: 0.6;
+      line-height: 1;
+    }
+
+    .close-btn:hover {
+      opacity: 1;
+    }
+
+    .emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    @media (min-width: 480px) {
+      .emoji-grid {
+        grid-template-columns: repeat(8, 1fr);
+        gap: 8px;
+        max-height: 300px;
+      }
+    }
+
+    .emoji-item {
+      font-size: 24px;
+      padding: 6px;
+      cursor: pointer;
+      border-radius: 8px;
+      text-align: center;
+      transition: background 0.2s;
+    }
+
+    @media (min-width: 640px) {
+      .emoji-item {
+        font-size: 28px;
+        padding: 8px;
+      }
+    }
+
+    .emoji-item:hover {
+      background: var(--bar-bg);
+    }
+
+    .setting-group {
+      margin-bottom: 20px;
+    }
+
+    @media (min-width: 640px) {
+      .setting-group {
+        margin-bottom: 24px;
+      }
+    }
+
+    .setting-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    @media (min-width: 640px) {
+      .setting-group label {
+        font-size: 14px;
+      }
+    }
+
+    .setting-group select {
+      width: 100%;
+      padding: 9px;
+      border: 2px solid var(--bar-bg);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    @media (min-width: 640px) {
+      .setting-group select {
+        padding: 10px;
+        font-size: 14px;
+      }
+    }
+
+    .palette-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    @media (min-width: 480px) {
+      .palette-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+    }
+
+    .palette-card {
+      padding: 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: all 0.3s;
+    }
+
+    @media (min-width: 640px) {
+      .palette-card {
+        padding: 16px;
+      }
+    }
+
+    .palette-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .palette-card.selected {
+      border-color: var(--text);
+    }
+
+    .palette-name {
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    @media (min-width: 640px) {
+      .palette-name {
+        font-size: 14px;
+      }
+    }
+
+    .palette-colors {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .palette-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+    }
+
+    @media (min-width: 640px) {
+      .palette-dot {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .color-inputs {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--bar-bg);
+    }
+
+    @media (min-width: 640px) {
+      .color-inputs {
+        gap: 12px;
+        margin-top: 16px;
+        padding-top: 16px;
+      }
+    }
+
+    .color-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .color-input-row label {
+      flex: 1;
+      font-size: 12px;
+      margin: 0;
+    }
+
+    @media (min-width: 640px) {
+      .color-input-row label {
+        font-size: 13px;
+      }
+    }
+
+    .color-input-row input[type="color"] {
+      width: 45px;
+      height: 32px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    @media (min-width: 640px) {
+      .color-input-row input[type="color"] {
+        width: 50px;
+        height: 35px;
+      }
+    }
+
+    .error-message {
+      background: #ff4444;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-size: 13px;
+      display: none;
+    }
+
+    @media (min-width: 640px) {
+      .error-message {
+        padding: 12px;
+        margin-top: 12px;
+        font-size: 14px;
+      }
+    }
+
+    .error-message.show {
+      display: block;
+    }
+  </style>
 </head>
-
 <body>
-
-<div class="card">
-  <div class="header">
-    <div class="title">
-      <span id="mainIcon">☁️</span>
-      <span id="titleText">Current Addiction</span>
+  <div class="card" id="card">
+    <div class="header-row">
+      <div class="title">
+        <span class="icon-btn" id="iconBtn">⏱️</span>
+        <input type="text" id="titleInput" value="Timer" placeholder="Enter name...">
+      </div>
+      <span class="settings-btn" id="settingsBtn">⚙️</span>
     </div>
-    <div class="icons">
-      <span class="icon-btn" onclick="openSettings()">⚙️</span>
+
+    <div class="grid">
+      <div class="unit" id="monthUnit">
+        <div class="num-container" id="month"></div>
+        <div class="label">months</div>
+        <div class="bar rounded-bar"><div class="fill wave" id="monthBar"></div></div>
+      </div>
+      <div class="unit" id="dayUnit">
+        <div class="num-container" id="day"></div>
+        <div class="label">days</div>
+        <div class="bar rounded-bar"><div class="fill wave" id="dayBar"></div></div>
+      </div>
+      <div class="unit" id="hrUnit">
+        <div class="num-container" id="hr"></div>
+        <div class="label">hours</div>
+        <div class="bar rounded-bar"><div class="fill wave" id="hrBar"></div></div>
+      </div>
+      <div class="unit" id="minUnit">
+        <div class="num-container" id="min"></div>
+        <div class="label">minutes</div>
+        <div class="bar rounded-bar"><div class="fill wave" id="minBar"></div></div>
+      </div>
+      <div class="unit" id="secUnit">
+        <div class="num-container" id="sec"></div>
+        <div class="label">seconds</div>
+        <div class="bar rounded-bar"><div class="fill wave" id="secBar"></div></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>Time elapsed</span>
+      <button class="action-btn" id="actionBtn" disabled>Loading...</button>
+    </div>
+    <div class="error-message" id="errorMessage"></div>
+  </div>
+
+  <div class="modal" id="emojiModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Choose Icon</h2>
+        <span class="close-btn" id="closeEmoji">×</span>
+      </div>
+      <div class="emoji-grid" id="emojiGrid"></div>
     </div>
   </div>
 
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-value" id="sec">0</div>
-      <div class="stat-label">seconds</div>
-      <div class="bar"><div class="bar-fill" id="secBar"></div></div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" id="min">0</div>
-      <div class="stat-label">minutes</div>
-      <div class="bar"><div class="bar-fill" id="minBar"></div></div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" id="hour">0</div>
-      <div class="stat-label">hours</div>
-      <div class="bar"><div class="bar-fill" id="hourBar"></div></div>
-    </div>
-    <div class="stat">
-      <div class="stat-value" id="day">0</div>
-      <div class="stat-label">days</div>
-      <div class="bar"><div class="bar-fill" id="dayBar"></div></div>
+  <div class="modal" id="settingsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <span class="close-btn" id="closeSettings">×</span>
+      </div>
+
+      <div class="setting-group">
+        <label>Color Palette</label>
+        <div class="palette-grid" id="paletteGrid"></div>
+        
+        <div class="color-inputs">
+          <div class="color-input-row">
+            <label>Progress Background</label>
+            <input type="color" id="barBgColor" value="#e6d9fa">
+          </div>
+          <div class="color-input-row">
+            <label>Progress Fill</label>
+            <input type="color" id="barFillColor" value="#9b5cf6">
+          </div>
+          <div class="color-input-row">
+            <label>Button</label>
+            <input type="color" id="buttonColor" value="#9b5cf6">
+          </div>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <label>Number Animation</label>
+        <select id="numberAnim">
+          <option value="flip">Slide Animation</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+
+      <div class="setting-group">
+        <label>Progress Bar Shape</label>
+        <select id="barShape">
+          <option value="rounded-bar">Rounded Bar (Default)</option>
+          <option value="circle">Circle</option>
+          <option value="thin-bar">Thin Bar</option>
+          <option value="square-bar">Square Bar</option>
+        </select>
+      </div>
+
+      <div class="setting-group">
+        <label>Progress Bar Style</label>
+        <select id="barStyle">
+          <option value="wave">Wave</option>
+          <option value="glow">Glow</option>
+          <option value="gradient">Gradient</option>
+          <option value="shimmer">Shimmer</option>
+          <option value="pulse-glow">Pulse Glow</option>
+          <option value="smooth">Simple</option>
+        </select>
+      </div>
+
+      <div class="setting-group">
+        <label>Card Corner Radius</label>
+        <select id="borderRadius">
+          <option value="20px">Rounded (Default)</option>
+          <option value="8px">Slightly Rounded</option>
+          <option value="0px">Square</option>
+          <option value="30px">Very Rounded</option>
+        </select>
+      </div>
+
+      <div class="setting-group">
+        <label>Font Size</label>
+        <select id="fontSize">
+          <option value="40px">Normal (Default)</option>
+          <option value="32px">Small</option>
+          <option value="48px">Large</option>
+          <option value="56px">Extra Large</option>
+        </select>
+      </div>
     </div>
   </div>
 
-  <div class="footer">
-    Since your last relapse
-  </div>
-</div>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-<!-- ===== SETTINGS MODAL ===== -->
-<div class="modal" id="settings">
-  <div class="modal-content">
-    <h3>Settings</h3>
+  <script>
+    /* ================================
+       1. FIREBASE CONFIG
+       ================================ */
+    const firebaseConfig = {
+      apiKey: "AIzaSyClohsSAkMTeYCqq_PRK_F5aSfpPupTaJM",
+      authDomain: "notion-persistent-timer.firebaseapp.com",
+      projectId: "notion-persistent-timer",
+      storageBucket: "notion-persistent-timer.firebasestorage.app",
+      messagingSenderId: "358621702162",
+      appId: "1:358621702162:web:127f2c1fb57e9e1f0390cb"
+    };
 
-    <p>Theme color</p>
-    <div class="color-options">
-      <span style="background:#a855f7" onclick="setAccent('#a855f7')"></span>
-      <span style="background:#22c55e" onclick="setAccent('#22c55e')"></span>
-      <span style="background:#3b82f6" onclick="setAccent('#3b82f6')"></span>
-      <span style="background:#ef4444" onclick="setAccent('#ef4444')"></span>
-    </div>
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const timerRef = db.collection("timers").doc("notionTimer");
 
-    <p>Icon</p>
-    <div class="icon-options">
-      <span onclick="setIcon('☁️')">☁️</span>
-      <span onclick="setIcon('🔥')">🔥</span>
-      <span onclick="setIcon('🧠')">🧠</span>
-      <span onclick="setIcon('💜')">💜</span>
-    </div>
+    /* ================================
+       2. UI STATE
+       ================================ */
+    const emojis = ['⏱️','⏰','⌚','🕐','⏳','⌛','💭','🧠','💪','🎯','⭐','🌟','✨','🔥','💎','🏆','❤️','💚','💙','💜','🌈','🦋','🌸','🌺','🌻','🌹','🌷','🍀','🌿','🌱','🎨','🎭','🎪','🎬','🎮','🎯','🎲','🎰','🎻','🎸','🎺','🎷','🎼','🎵','🎶','☀️','🌙','⭐','🌟','💫','✨','🌍','🌎','🌏','🗺️','🧭','⛰️','🏔️','🗻','🌋','🏕️'];
 
-    <br>
-    <button onclick="closeSettings()">Close</button>
-  </div>
-</div>
+    const palettes = [
+      { name: 'Purple Dream', barBg: '#e6d9fa', barFill: '#9b5cf6', button: '#9b5cf6' },
+      { name: 'Pink Paradise', barBg: '#ffd3e1', barFill: '#ff6b9d', button: '#ff4081' },
+      { name: 'Ocean Blue', barBg: '#d3e9ff', barFill: '#4a90e2', button: '#2e7dd9' },
+      { name: 'Mint Fresh', barBg: '#d3f5e6', barFill: '#4ecdc4', button: '#3ab8af' },
+      { name: 'Sunset Orange', barBg: '#ffe5d3', barFill: '#ff8a5b', button: '#ff6b35' },
+      { name: 'Golden Hour', barBg: '#fff4d3', barFill: '#ffd93d', button: '#ffc107' },
+      { name: 'Forest Green', barBg: '#d8f3dc', barFill: '#52b788', button: '#40916c' },
+      { name: 'Lavender Dream', barBg: '#e8d9f5', barFill: '#b084cc', button: '#9b59b6' },
+      { name: 'Rose Gold', barBg: '#fde8e9', barFill: '#e8a0a6', button: '#d87c82' },
+      { name: 'Coral Reef', barBg: '#ffe8e1', barFill: '#ff8f7a', button: '#ff6b54' }
+    ];
 
-<script>
-/* ========= FIREBASE CONFIG ========= */
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const ref = db.collection("timers").doc("notionTimer");
+    let state = {
+      title: "Timer",
+      icon: "⏱️",
+      barBg: "#e6d9fa",
+      barFill: "#9b5cf6",
+      buttonBg: "#9b5cf6",
+      numberAnim: "flip",
+      barStyle: "wave",
+      barShape: "rounded-bar",
+      borderRadius: "20px",
+      fontSize: "40px",
+      selectedPalette: 0
+    };
 
-let startTime = null;
+    let startTime = null;
+    let prevValues = { month: '', day: '', hr: '', min: '', sec: '' };
+    let isOperating = false; // Prevent concurrent operations
 
-/* ========= LOAD ========= */
-ref.get().then(d => {
-  if (d.exists) startTime = d.data().startTime;
-});
+    /* ================================
+       3. UI ELEMENTS
+       ================================ */
+    const actionBtn = document.getElementById("actionBtn");
+    const titleInput = document.getElementById("titleInput");
+    const iconBtn = document.getElementById("iconBtn");
+    const settingsBtn = document.getElementById("settingsBtn");
+    const card = document.getElementById("card");
+    const emojiModal = document.getElementById("emojiModal");
+    const settingsModal = document.getElementById("settingsModal");
+    const emojiGrid = document.getElementById("emojiGrid");
+    const paletteGrid = document.getElementById("paletteGrid");
+    const errorMessage = document.getElementById("errorMessage");
 
-/* ========= UPDATE LOOP ========= */
-setInterval(() => {
-  if (!startTime) return;
+    /* ================================
+       4. ERROR HANDLING
+       ================================ */
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.classList.add('show');
+      setTimeout(() => {
+        errorMessage.classList.remove('show');
+      }, 5000);
+    }
 
-  const diff = Date.now() - startTime;
-  const s = Math.floor(diff / 1000);
-  const m = Math.floor(s / 60);
-  const h = Math.floor(m / 60);
-  const d = Math.floor(h / 24);
+    /* ================================
+       5. EMOJI PICKER
+       ================================ */
+    emojis.forEach(emoji => {
+      const div = document.createElement('div');
+      div.className = 'emoji-item';
+      div.textContent = emoji;
+      div.onclick = () => {
+        state.icon = emoji;
+        iconBtn.textContent = emoji;
+        emojiModal.classList.remove('show');
+        saveSettings();
+      };
+      emojiGrid.appendChild(div);
+    });
 
-  sec.textContent = s % 60;
-  min.textContent = m % 60;
-  hour.textContent = h % 24;
-  day.textContent = d;
+    /* ================================
+       6. PALETTE PICKER
+       ================================ */
+    palettes.forEach((palette, idx) => {
+      const div = document.createElement('div');
+      div.className = 'palette-card';
+      if (idx === 0) div.classList.add('selected');
+      div.style.background = palette.barBg;
+      div.innerHTML = `
+        <div class="palette-name" style="color: ${palette.button}">${palette.name}</div>
+        <div class="palette-colors">
+          <div class="palette-dot" style="background: ${palette.barBg}"></div>
+          <div class="palette-dot" style="background: ${palette.barFill}"></div>
+          <div class="palette-dot" style="background: ${palette.button}"></div>
+        </div>
+      `;
+      div.onclick = () => {
+        state.selectedPalette = idx;
+        state.barBg = palette.barBg;
+        state.barFill = palette.barFill;
+        state.buttonBg = palette.button;
+        
+        applyColors();
+        
+        document.getElementById('barBgColor').value = palette.barBg;
+        document.getElementById('barFillColor').value = palette.barFill;
+        document.getElementById('buttonColor').value = palette.button;
+        
+        document.querySelectorAll('.palette-card').forEach(c => c.classList.remove('selected'));
+        div.classList.add('selected');
+        
+        saveSettings();
+      };
+      paletteGrid.appendChild(div);
+    });
 
-  secBar.style.width = (s % 60) / 60 * 100 + "%";
-  minBar.style.width = (m % 60) / 60 * 100 + "%";
-  hourBar.style.width = (h % 24) / 24 * 100 + "%";
-  dayBar.style.width = Math.min(d / 30 * 100, 100) + "%";
-}, 1000);
+    /* ================================
+       7. MODAL HANDLERS
+       ================================ */
+    iconBtn.onclick = () => emojiModal.classList.add('show');
+    settingsBtn.onclick = () => settingsModal.classList.add('show');
+    document.getElementById('closeEmoji').onclick = () => emojiModal.classList.remove('show');
+    document.getElementById('closeSettings').onclick = () => settingsModal.classList.remove('show');
 
-/* ========= SETTINGS ========= */
-function openSettings() {
-  settings.style.display = "flex";
-}
-function closeSettings() {
-  settings.style.display = "none";
-}
-function setAccent(color) {
-  document.documentElement.style.setProperty('--accent', color);
-}
-function setIcon(icon) {
-  mainIcon.textContent = icon;
-}
-</script>
+    emojiModal.onclick = (e) => {
+      if (e.target === emojiModal) emojiModal.classList.remove('show');
+    };
+    settingsModal.onclick = (e) => {
+      if (e.target === settingsModal) settingsModal.classList.remove('show');
+    };
 
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    /* ================================
+       8. SETTINGS HANDLERS
+       ================================ */
+    const barBgColor = document.getElementById('barBgColor');
+    const barFillColor = document.getElementById('barFillColor');
+    const buttonColor = document.getElementById('buttonColor');
+    const numberAnim = document.getElementById('numberAnim');
+    const barStyle = document.getElementById('barStyle');
+    const barShape = document.getElementById('barShape');
+    const borderRadius = document.getElementById('borderRadius');
+    const fontSize = document.getElementById('fontSize');
 
+    function applyColors() {
+      document.documentElement.style.setProperty('--bar-bg', state.barBg);
+      document.documentElement.style.setProperty('--bar-fill', state.barFill);
+      document.documentElement.style.setProperty('--button-bg', state.buttonBg);
+    }
+
+    barBgColor.oninput = (e) => {
+      state.barBg = e.target.value;
+      applyColors();
+      saveSettings();
+    };
+
+    barFillColor.oninput = (e) => {
+      state.barFill = e.target.value;
+      applyColors();
+      saveSettings();
+    };
+
+    buttonColor.oninput = (e) => {
+      state.buttonBg = e.target.value;
+      applyColors();
+      saveSettings();
+    };
+
+    numberAnim.onchange = (e) => {
+      state.numberAnim = e.target.value;
+      saveSettings();
+    };
+    
+    barStyle.onchange = (e) => {
+      state.barStyle = e.target.value;
+      document.querySelectorAll('.fill').forEach(fill => {
+        fill.className = 'fill';
+        if (e.target.value !== 'smooth') fill.classList.add(e.target.value);
+      });
+      saveSettings();
+    };
+
+    barShape.onchange = (e) => {
+      state.barShape = e.target.value;
+      document.querySelectorAll('.bar').forEach(bar => {
+        bar.className = 'bar';
+        bar.classList.add(e.target.value);
+        const fill = bar.querySelector('.fill');
+        if (fill && state.barStyle !== 'smooth') {
+          fill.classList.add(state.barStyle);
+        }
+      });
+      saveSettings();
+    };
+
+    borderRadius.onchange = (e) => {
+      state.borderRadius = e.target.value;
+      card.style.borderRadius = e.target.value;
+      saveSettings();
+    };
+
+    fontSize.onchange = (e) => {
+      state.fontSize = e.target.value;
+      document.querySelectorAll('.num-container').forEach(num => num.style.fontSize = e.target.value);
+      saveSettings();
+    };
+
+    titleInput.oninput = () => {
+      state.title = titleInput.value;
+      saveSettings();
+    };
+
+    /* ================================
+       9. SAVE SETTINGS TO FIREBASE
+       ================================ */
+    let saveTimeout;
+    async function saveSettings() {
+      // Debounce saves to avoid too many writes
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(async () => {
+        try {
+          await timerRef.update({
+            settings: state
+          });
+        } catch (err) {
+          console.error("Failed to save settings:", err);
+        }
+      }, 500);
+    }
+
+    /* ================================
+       10. APPLY SETTINGS TO UI
+       ================================ */
+    function applySettings() {
+      titleInput.value = state.title;
+      iconBtn.textContent = state.icon;
+      
+      applyColors();
+      
+      barBgColor.value = state.barBg;
+      barFillColor.value = state.barFill;
+      buttonColor.value = state.buttonBg;
+      
+      numberAnim.value = state.numberAnim;
+      barStyle.value = state.barStyle;
+      barShape.value = state.barShape;
+      borderRadius.value = state.borderRadius;
+      fontSize.value = state.fontSize;
+      
+      // Apply bar style
+      document.querySelectorAll('.fill').forEach(fill => {
+        fill.className = 'fill';
+        if (state.barStyle !== 'smooth') fill.classList.add(state.barStyle);
+      });
+      
+      // Apply bar shape
+      document.querySelectorAll('.bar').forEach(bar => {
+        bar.className = 'bar';
+        bar.classList.add(state.barShape);
+      });
+      
+      // Apply border radius
+      card.style.borderRadius = state.borderRadius;
+      
+      // Apply font size
+      document.querySelectorAll('.num-container').forEach(num => num.style.fontSize = state.fontSize);
+      
+      // Update selected palette
+      document.querySelectorAll('.palette-card').forEach((c, idx) => {
+        c.classList.remove('selected');
+        if (idx === state.selectedPalette) {
+          c.classList.add('selected');
+        }
+      });
+    }
+
+    /* ================================
+       11. FIREBASE FUNCTIONS
+       ================================ */
+    async function loadTimer() {
+      card.classList.add('loading');
+      try {
+        const doc = await timerRef.get();
+        
+        if (doc.exists) {
+          const data = doc.data();
+          
+          // Load timer
+          if (data.startTime) {
+            startTime = data.startTime;
+            actionBtn.textContent = "Reset";
+            actionBtn.classList.add("running");
+          } else {
+            actionBtn.textContent = "Start";
+            actionBtn.classList.remove("running");
+          }
+          
+          // Load settings
+          if (data.settings) {
+            state = { ...state, ...data.settings };
+            applySettings();
+          }
+        } else {
+          actionBtn.textContent = "Start";
+          actionBtn.classList.remove("running");
+        }
+      } catch (err) {
+        console.error("Failed to load timer:", err);
+        showError("Failed to load timer. Please refresh the page.");
+        actionBtn.textContent = "Start";
+        actionBtn.classList.remove("running");
+      } finally {
+        card.classList.remove('loading');
+        actionBtn.disabled = false;
+      }
+    }
+
+    async function startTimer() {
+      if (startTime !== null || isOperating) return;
+      
+      isOperating = true;
+      actionBtn.disabled = true;
+      
+      try {
+        const now = Date.now();
+        
+        // Save to Firebase first
+        await timerRef.set({
+          startTime: now,
+          settings: state
+        });
+        
+        // Only set local state after successful save
+        startTime = now;
+        actionBtn.textContent = "Reset";
+        actionBtn.classList.add("running");
+        
+        card.classList.remove("pulse");
+        void card.offsetWidth;
+        card.classList.add("pulse");
+      } catch (err) {
+        console.error("Failed to start timer:", err);
+        showError("Failed to start timer. Please try again.");
+        startTime = null;
+        actionBtn.textContent = "Start";
+        actionBtn.classList.remove("running");
+      } finally {
+        isOperating = false;
+        actionBtn.disabled = false;
+      }
+    }
+
+    async function resetTimer() {
+      if (isOperating) return;
+      
+      isOperating = true;
+      actionBtn.disabled = true;
+      
+      try {
+        // Clear display first for immediate feedback
+        document.querySelectorAll('.unit').forEach(u => u.classList.remove('visible'));
+        
+        // Clear prev values for clean restart
+        prevValues = { month: '', day: '', hr: '', min: '', sec: '' };
+        
+        // Save to Firebase
+        await timerRef.set({
+          settings: state
+        });
+        
+        // Update local state after successful save
+        startTime = null;
+        actionBtn.textContent = "Start";
+        actionBtn.classList.remove("running");
+      } catch (err) {
+        console.error("Failed to reset timer:", err);
+        showError("Failed to reset timer. Please try again.");
+      } finally {
+        isOperating = false;
+        actionBtn.disabled = false;
+      }
+    }
+
+    /* ================================
+       12. DISPLAY FUNCTIONS
+       ================================ */
+    function setNumber(containerId, newValue) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      
+      const oldValue = prevValues[containerId];
+      const newStr = String(newValue).padStart(2, '0');
+      const oldStr = String(oldValue).padStart(2, '0');
+
+      if (oldValue === '' || oldStr.length !== newStr.length) {
+        container.innerHTML = '';
+        for (let i = 0; i < newStr.length; i++) {
+          const digit = document.createElement('span');
+          digit.className = 'digit';
+          digit.innerHTML = `<span class="digit-inner">${newStr[i]}</span>`;
+          container.appendChild(digit);
+        }
+      } else {
+        for (let i = 0; i < newStr.length; i++) {
+          if (oldStr[i] !== newStr[i]) {
+            const digit = container.children[i];
+            if (!digit) continue;
+            
+            if (state.numberAnim === 'flip') {
+              // Clear any existing animation
+              digit.classList.remove('flipping');
+              
+              // Remove all old digit-inner elements except the first one
+              const inners = digit.querySelectorAll('.digit-inner');
+              for (let j = 1; j < inners.length; j++) {
+                inners[j].remove();
+              }
+              
+              const oldInner = digit.querySelector('.digit-inner');
+              if (!oldInner) continue;
+              
+              oldInner.classList.remove('old', 'new');
+              oldInner.classList.add('old');
+              
+              const newInner = document.createElement('span');
+              newInner.className = 'digit-inner new';
+              newInner.textContent = newStr[i];
+              digit.appendChild(newInner);
+              
+              // Force reflow to restart animation
+              void digit.offsetWidth;
+              digit.classList.add('flipping');
+              
+              setTimeout(() => {
+                if (digit.contains(oldInner)) {
+                  digit.classList.remove('flipping');
+                  oldInner.remove();
+                  newInner.classList.remove('new');
+                }
+              }, 600);
+            } else {
+              const inner = digit.querySelector('.digit-inner');
+              if (inner) inner.textContent = newStr[i];
+            }
+          }
+        }
+      }
+
+      prevValues[containerId] = newValue;
+    }
+
+    function updateBar(barId, percentage) {
+      const bar = document.getElementById(barId);
+      if (!bar) return;
+      
+      const parentBar = bar.parentElement;
+      
+      if (parentBar.classList.contains('circle')) {
+        parentBar.style.background = `conic-gradient(var(--bar-fill) ${percentage}%, var(--bar-bg) ${percentage}%)`;
+      } else {
+        bar.style.width = percentage + "%";
+      }
+    }
+
+    function updateDisplay() {
+      if (!startTime) {
+        return;
+      }
+
+      const diff = Math.max(0, Math.floor((Date.now() - startTime) / 1000));
+
+      const sec = diff % 60;
+      const totalMinutes = Math.floor(diff / 60);
+      const min = totalMinutes % 60;
+      const totalHours = Math.floor(totalMinutes / 60);
+      const hr = totalHours % 24;
+      const totalDays = Math.floor(totalHours / 24);
+      const day = totalDays % 30;
+      const month = Math.floor(totalDays / 30);
+
+      const monthUnit = document.getElementById("monthUnit");
+      const dayUnit = document.getElementById("dayUnit");
+      const hrUnit = document.getElementById("hrUnit");
+      const minUnit = document.getElementById("minUnit");
+      const secUnit = document.getElementById("secUnit");
+
+      if (month > 0) {
+        monthUnit.classList.add("visible");
+        setNumber("month", month);
+        updateBar("monthBar", 100);
+      } else {
+        monthUnit.classList.remove("visible");
+      }
+
+      if (day > 0 || month > 0) {
+        dayUnit.classList.add("visible");
+        setNumber("day", day);
+        updateBar("dayBar", (day / 30) * 100);
+      } else {
+        dayUnit.classList.remove("visible");
+      }
+
+      if (hr > 0 || day > 0 || month > 0) {
+        hrUnit.classList.add("visible");
+        setNumber("hr", hr);
+        updateBar("hrBar", (hr / 24) * 100);
+      } else {
+        hrUnit.classList.remove("visible");
+      }
+
+      if (min > 0 || hr > 0 || day > 0 || month > 0) {
+        minUnit.classList.add("visible");
+        setNumber("min", min);
+        updateBar("minBar", (min / 60) * 100);
+      } else {
+        minUnit.classList.remove("visible");
+      }
+
+      secUnit.classList.add("visible");
+      setNumber("sec", sec);
+      updateBar("secBar", (sec / 60) * 100);
+    }
+
+    /* ================================
+       13. BUTTON HANDLER
+       ================================ */
+    actionBtn.onclick = () => {
+      if (startTime === null) {
+        startTimer();
+      } else {
+        resetTimer();
+      }
+    };
+
+    /* ================================
+       14. INIT
+       ================================ */
+    loadTimer();
+    
+    function loop() {
+      updateDisplay();
+      requestAnimationFrame(loop);
+    }
+    
+    loop();
+  </script>
 </body>
 </html>
