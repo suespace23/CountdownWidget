@@ -44,6 +44,12 @@
       opacity: 0.7;
     }
 
+    .buttons {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
     button {
       padding: 6px 14px;
       border-radius: 8px;
@@ -52,6 +58,10 @@
       color: white;
       cursor: pointer;
       font-size: 0.9rem;
+    }
+
+    button.reset {
+      background: #dc2626;
     }
   </style>
 </head>
@@ -66,7 +76,10 @@
       <div><span id="seconds">0</span><small>Seconds</small></div>
     </div>
 
-    <button id="startBtn">Start Timer</button>
+    <div class="buttons">
+      <button id="startBtn">Start</button>
+      <button id="resetBtn" class="reset">Reset</button>
+    </div>
   </div>
 
   <script>
@@ -76,11 +89,16 @@
       : null;
 
     const startBtn = document.getElementById("startBtn");
+    const resetBtn = document.getElementById("resetBtn");
 
     startBtn.addEventListener("click", () => {
       const now = Date.now();
-      // Persist start time in URL
       window.location.search = `?start=${now}`;
+    });
+
+    resetBtn.addEventListener("click", () => {
+      // Clear URL params → full reset across devices
+      window.location.href = window.location.pathname;
     });
 
     function updateTimer() {
@@ -106,6 +124,7 @@
       document.getElementById("seconds").textContent = seconds % 60;
 
       startBtn.style.display = "none";
+      resetBtn.style.display = "inline-block";
     }
 
     updateTimer();
