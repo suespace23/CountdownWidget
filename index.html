@@ -2,133 +2,133 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Persistent Count Up</title>
+  <title>Persistent Notion Timer</title>
 
   <style>
     body {
-      margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       background: transparent;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .container {
       text-align: center;
+      margin: 0;
+      padding: 12px;
     }
 
-    .timer {
-      display: flex;
-      gap: 16px;
-      padding: 12px 16px;
-      background: #111;
-      color: #fff;
-      border-radius: 12px;
+    #timer {
+      font-size: 20px;
+      font-weight: 600;
       margin-bottom: 10px;
     }
 
-    .timer div {
-      text-align: center;
-    }
-
-    .timer span {
-      font-size: 1.5rem;
-      font-weight: 600;
-    }
-
-    .timer small {
-      display: block;
-      font-size: 0.7rem;
-      opacity: 0.7;
-    }
-
-    .buttons {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-    }
-
     button {
-      padding: 6px 14px;
-      border-radius: 8px;
-      border: none;
-      background: #2563eb;
-      color: white;
+      font-size: 12px;
+      padding: 6px 10px;
+      margin: 4px;
       cursor: pointer;
-      font-size: 0.9rem;
-    }
-
-    button.reset {
-      background: #dc2626;
     }
   </style>
 </head>
-
 <body>
-  <div class="container">
-    <div class="timer" id="timer">
-      <div><span id="months">0</span><small>Months</small></div>
-      <div><span id="days">0</span><small>Days</small></div>
-      <div><span id="hours">0</span><small>Hours</small></div>
-      <div><span id="minutes">0</span><small>Minutes</small></div>
-      <div><span id="seconds">0</span><small>Seconds</small></div>
-    </div>
 
-    <div class="buttons">
-      <button id="startBtn">Start</button>
-      <button id="resetBtn" class="reset">Reset</button>
-    </div>
-  </div>
+  <div id="timer">0M 0D 0H 0M 0S</div>
+
+  <button onclick="startTimer()">Start</button>
+  <button onclick="resetTimer()">Reset</button>
+
+  <!-- Firebase SDKs (compat = simplest, stable) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-    let startTime = params.get("start")
-      ? new Date(Number(params.get("start")))
-      : null;
+    /* ================================
+       1. FIREBASE CONFIG (PASTE YOURS)
+       ================================ */
+    const firebaseConfig = {
+      apiKey: "AIzaSyClohsSAkMTeYCqq_PRK_F5aSfpPupTaJM",
+      authDomain: "notion-persistent-timer.firebaseapp.com",
+      projectId: "notion-persistent-timer",
+      storageBucket: "notion-persistent-timer.firebasestorage.app",
+      messagingSenderId:  "358621702162",
+      appId: "1:358621702162:web:127f2c1fb57e9e1f0390cb"
+    };
 
-    const startBtn = document.getElementById("startBtn");
-    const resetBtn = document.getElementById("resetBtn");
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-    startBtn.addEventListener("click", () => {
-      const now = Date.now();
-      window.location.search = `?start=${now}`;
-    });
+    /* ================================
+       2. FIRESTORE REFERENCE
+       ================================ */
+    const timerRef = db.collection("timers").doc("notionTimer");
 
-    resetBtn.addEventListener("click", () => {
-      // Clear URL params → full reset across devices
-      window.location.href = window.location.pathname;
-    });
+    let startTime = null;
 
-    function updateTimer() {
-      if (!startTime) return;
-
-      const now = new Date();
-      let diff = now - startTime;
-
-      if (diff < 0) diff = 0;
-
-      const seconds = Math.floor(diff / 1000);
-      const minutes = Math.floor(seconds / 60);
-      const hours = Math.floor(minutes / 60);
-      const daysTotal = Math.floor(hours / 24);
-
-      const months = Math.floor(daysTotal / 30);
-      const days = daysTotal % 30;
-
-      document.getElementById("months").textContent = months;
-      document.getElementById("days").textContent = days;
-      document.getElementById("hours").textContent = hours % 24;
-      document.getElementById("minutes").textContent = minutes % 60;
-      document.getElementById("seconds").textContent = seconds % 60;
-
-      startBtn.style.display = "none";
-      resetBtn.style.display = "inline-block";
+    /* ================================
+       3. LOAD TIMER ON PAGE LOAD
+       ================================ */
+    async function loadTimer() {
+      try {
+        const doc = await timerRef.get();
+        if (doc.exists && doc.data().startTime) {
+          startTime = doc.data().startTime;
+        }
+      } catch (err) {
+        console.error("Failed to load timer:", err);
+      }
     }
 
-    updateTimer();
-    setInterval(updateTimer, 1000);
+    /* ================================
+       4. START TIMER (ONE-TIME WRITE)
+       ================================ */
+    async function startTimer() {
+      if (startTime !== null) return;
+
+      startTime = Date.now();
+      await timerRef.set({ startTime });
+    }
+
+    /* ================================
+       5. RESET TIMER
+       ================================ */
+    async function resetTimer() {
+      startTime = null;
+      await timerRef.delete();
+    }
+
+    /* ================================
+       6. DISPLAY UPDATE LOOP
+       ================================ */
+    function updateDisplay() {
+      if (!startTime) {
+        document.getElementById("timer").textContent =
+          "0M 0D 0H 0M 0S";
+        return;
+      }
+
+      const diff = Date.now() - startTime;
+
+      const totalSeconds = Math.floor(diff / 1000);
+      const seconds = totalSeconds % 60;
+
+      const totalMinutes = Math.floor(totalSeconds / 60);
+      const minutes = totalMinutes % 60;
+
+      const totalHours = Math.floor(totalMinutes / 60);
+      const hours = totalHours % 24;
+
+      const totalDays = Math.floor(totalHours / 24);
+      const days = totalDays % 30;
+
+      const months = Math.floor(totalDays / 30);
+
+      document.getElementById("timer").textContent =
+        `${months}M ${days}D ${hours}H ${minutes}M ${seconds}S`;
+    }
+
+    /* ================================
+       7. INIT
+       ================================ */
+    loadTimer();
+    setInterval(updateDisplay, 1000);
   </script>
+
 </body>
 </html>
