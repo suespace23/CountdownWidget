@@ -1,134 +1,297 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Persistent Notion Timer</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: transparent;
-      text-align: center;
-      margin: 0;
-      padding: 12px;
-    }
+<title>Persistent Notion Timer</title>
 
-    #timer {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
+<style>
+:root {
+  --accent: #a855f7;
+  --bg-dark: #0b0b0c;
+  --bg-light: #ffffff;
+  --text-dark: #ffffff;
+  --text-light: #000000;
+  --muted-dark: #9ca3af;
+  --muted-light: #6b7280;
+  --bar-bg-dark: #2a1438;
+  --bar-bg-light: #e9d5ff;
+}
 
-    button {
-      font-size: 12px;
-      padding: 6px 10px;
-      margin: 4px;
-      cursor: pointer;
-    }
-  </style>
+/* ===== AUTO DARK MODE (Notion) ===== */
+@media (prefers-color-scheme: dark) {
+  body {
+    --bg: var(--bg-dark);
+    --text: var(--text-dark);
+    --muted: var(--muted-dark);
+    --bar-bg: var(--bar-bg-dark);
+  }
+}
+@media (prefers-color-scheme: light) {
+  body {
+    --bg: var(--bg-light);
+    --text: var(--text-light);
+    --muted: var(--muted-light);
+    --bar-bg: var(--bar-bg-light);
+  }
+}
+
+body {
+  margin: 0;
+  padding: 16px;
+  background: transparent;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.card {
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+  max-width: 640px;
+}
+
+/* ===== HEADER ===== */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.title span {
+  cursor: pointer;
+}
+
+.icons {
+  display: flex;
+  gap: 10px;
+}
+
+.icon-btn {
+  cursor: pointer;
+  opacity: 0.7;
+}
+.icon-btn:hover { opacity: 1; }
+
+/* ===== STATS ===== */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.stat {
+  text-align: left;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.bar {
+  background: var(--bar-bg);
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.bar-fill {
+  background: var(--accent);
+  height: 100%;
+  width: 0%;
+  transition: width 0.6s ease;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 14px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 14px;
+}
+
+/* ===== MODAL ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: var(--bg);
+  color: var(--text);
+  padding: 20px;
+  border-radius: 16px;
+  width: 300px;
+}
+
+.modal h3 {
+  margin-top: 0;
+}
+
+.color-options span,
+.icon-options span {
+  cursor: pointer;
+  padding: 6px;
+  display: inline-block;
+  font-size: 20px;
+}
+
+.color-options span {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+</style>
 </head>
+
 <body>
 
-  <div id="timer">0M 0D 0H 0M 0S</div>
+<div class="card">
+  <div class="header">
+    <div class="title">
+      <span id="mainIcon">☁️</span>
+      <span id="titleText">Current Addiction</span>
+    </div>
+    <div class="icons">
+      <span class="icon-btn" onclick="openSettings()">⚙️</span>
+    </div>
+  </div>
 
-  <button onclick="startTimer()">Start</button>
-  <button onclick="resetTimer()">Reset</button>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-value" id="sec">0</div>
+      <div class="stat-label">seconds</div>
+      <div class="bar"><div class="bar-fill" id="secBar"></div></div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="min">0</div>
+      <div class="stat-label">minutes</div>
+      <div class="bar"><div class="bar-fill" id="minBar"></div></div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="hour">0</div>
+      <div class="stat-label">hours</div>
+      <div class="bar"><div class="bar-fill" id="hourBar"></div></div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="day">0</div>
+      <div class="stat-label">days</div>
+      <div class="bar"><div class="bar-fill" id="dayBar"></div></div>
+    </div>
+  </div>
 
-  <!-- Firebase SDKs (compat = simplest, stable) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <div class="footer">
+    Since your last relapse
+  </div>
+</div>
 
-  <script>
-    /* ================================
-       1. FIREBASE CONFIG (PASTE YOURS)
-       ================================ */
-    const firebaseConfig = {
-      apiKey: "AIzaSyClohsSAkMTeYCqq_PRK_F5aSfpPupTaJM",
-      authDomain: "notion-persistent-timer.firebaseapp.com",
-      projectId: "notion-persistent-timer",
-      storageBucket: "notion-persistent-timer.firebasestorage.app",
-      messagingSenderId:  "358621702162",
-      appId: "1:358621702162:web:127f2c1fb57e9e1f0390cb"
-    };
+<!-- ===== SETTINGS MODAL ===== -->
+<div class="modal" id="settings">
+  <div class="modal-content">
+    <h3>Settings</h3>
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    <p>Theme color</p>
+    <div class="color-options">
+      <span style="background:#a855f7" onclick="setAccent('#a855f7')"></span>
+      <span style="background:#22c55e" onclick="setAccent('#22c55e')"></span>
+      <span style="background:#3b82f6" onclick="setAccent('#3b82f6')"></span>
+      <span style="background:#ef4444" onclick="setAccent('#ef4444')"></span>
+    </div>
 
-    /* ================================
-       2. FIRESTORE REFERENCE
-       ================================ */
-    const timerRef = db.collection("timers").doc("notionTimer");
+    <p>Icon</p>
+    <div class="icon-options">
+      <span onclick="setIcon('☁️')">☁️</span>
+      <span onclick="setIcon('🔥')">🔥</span>
+      <span onclick="setIcon('🧠')">🧠</span>
+      <span onclick="setIcon('💜')">💜</span>
+    </div>
 
-    let startTime = null;
+    <br>
+    <button onclick="closeSettings()">Close</button>
+  </div>
+</div>
 
-    /* ================================
-       3. LOAD TIMER ON PAGE LOAD
-       ================================ */
-    async function loadTimer() {
-      try {
-        const doc = await timerRef.get();
-        if (doc.exists && doc.data().startTime) {
-          startTime = doc.data().startTime;
-        }
-      } catch (err) {
-        console.error("Failed to load timer:", err);
-      }
-    }
+<script>
+/* ========= FIREBASE CONFIG ========= */
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const ref = db.collection("timers").doc("notionTimer");
 
-    /* ================================
-       4. START TIMER (ONE-TIME WRITE)
-       ================================ */
-    async function startTimer() {
-      if (startTime !== null) return;
+let startTime = null;
 
-      startTime = Date.now();
-      await timerRef.set({ startTime });
-    }
+/* ========= LOAD ========= */
+ref.get().then(d => {
+  if (d.exists) startTime = d.data().startTime;
+});
 
-    /* ================================
-       5. RESET TIMER
-       ================================ */
-    async function resetTimer() {
-      startTime = null;
-      await timerRef.delete();
-    }
+/* ========= UPDATE LOOP ========= */
+setInterval(() => {
+  if (!startTime) return;
 
-    /* ================================
-       6. DISPLAY UPDATE LOOP
-       ================================ */
-    function updateDisplay() {
-      if (!startTime) {
-        document.getElementById("timer").textContent =
-          "0M 0D 0H 0M 0S";
-        return;
-      }
+  const diff = Date.now() - startTime;
+  const s = Math.floor(diff / 1000);
+  const m = Math.floor(s / 60);
+  const h = Math.floor(m / 60);
+  const d = Math.floor(h / 24);
 
-      const diff = Date.now() - startTime;
+  sec.textContent = s % 60;
+  min.textContent = m % 60;
+  hour.textContent = h % 24;
+  day.textContent = d;
 
-      const totalSeconds = Math.floor(diff / 1000);
-      const seconds = totalSeconds % 60;
+  secBar.style.width = (s % 60) / 60 * 100 + "%";
+  minBar.style.width = (m % 60) / 60 * 100 + "%";
+  hourBar.style.width = (h % 24) / 24 * 100 + "%";
+  dayBar.style.width = Math.min(d / 30 * 100, 100) + "%";
+}, 1000);
 
-      const totalMinutes = Math.floor(totalSeconds / 60);
-      const minutes = totalMinutes % 60;
+/* ========= SETTINGS ========= */
+function openSettings() {
+  settings.style.display = "flex";
+}
+function closeSettings() {
+  settings.style.display = "none";
+}
+function setAccent(color) {
+  document.documentElement.style.setProperty('--accent', color);
+}
+function setIcon(icon) {
+  mainIcon.textContent = icon;
+}
+</script>
 
-      const totalHours = Math.floor(totalMinutes / 60);
-      const hours = totalHours % 24;
-
-      const totalDays = Math.floor(totalHours / 24);
-      const days = totalDays % 30;
-
-      const months = Math.floor(totalDays / 30);
-
-      document.getElementById("timer").textContent =
-        `${months}M ${days}D ${hours}H ${minutes}M ${seconds}S`;
-    }
-
-    /* ================================
-       7. INIT
-       ================================ */
-    loadTimer();
-    setInterval(updateDisplay, 1000);
-  </script>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 </body>
 </html>
