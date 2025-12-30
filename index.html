@@ -40,14 +40,6 @@
       align-items: center;
       min-height: 100vh;
       padding: 12px;
-      /* Hide scrollbar for all browsers */
-      -ms-overflow-style: none;  /* IE and Edge */
-      scrollbar-width: none;  /* Firefox */
-    }
-
-    
-    body::-webkit-scrollbar {
-      display: none;  /* Chrome, Safari, Opera */
     }
 
     .card {
@@ -826,6 +818,17 @@
     .error-message.show {
       display: block;
     }
+
+    /* === Notion Embed Scaling === */
+:root {
+  --ui-scale: 0.75; /* ← change this value */
+}
+
+.card {
+  transform: scale(0.6);
+  transform-origin: top center;
+}
+
   </style>
 </head>
 <body>
