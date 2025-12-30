@@ -38,7 +38,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: auto;
+      min-height: 100%;
     }
 
     .card {
@@ -59,7 +59,7 @@
     @media (min-width: 768px) {
       .card {
         padding: 32px 24px 24px;
-        max-width: 100%;
+        max-width: 720px;
       }
     }
 
@@ -68,35 +68,6 @@
       pointer-events: none;
     }
 
-    .header-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-
-    @media (min-width: 640px) {
-      .header-row {
-        margin-bottom: 24px;
-      }
-    }
-
-    .title {
-      display: flex;
-      align-items: center;
-      gap: 1px;
-      font-size: 18px;
-      font-weight: 600;
-      flex: 1;
-      min-width: 0;
-    }
-
-    @media (min-width: 640px) {
-      .title {
-        gap: 1px;
-        font-size: 20px;
-      }
-    }
 
 .icon-btn {
       font-size: 24px;
@@ -147,29 +118,6 @@
       opacity: 0.8;
     }
 
-.title input {
-      background: transparent;
-      border: none;
-      font-family: 'Manrope';
-      color: var(--text);
-      font-size: 20px; /* Slightly larger looks better with bold icons */
-      font-weight: 600; /* Use 700 for a true "Bold" look */
-      flex: 1;
-      min-width: 0;
-      outline: none;
-      padding: 4px 8px 4px 2px;
-      border-radius: 6px;
-    }
-
-    @media (min-width: 640px) {
-      .title input {
-        font-size: 25px;
-      }
-    }
-
-    .title input:focus {
-      background: var(--bar-bg);
-    }
 
     .grid {
       display: grid;
@@ -465,6 +413,148 @@
       flex-shrink: 0;
     }
 
+    .title-left {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .title-left input {
+      background: transparent;
+      border: none;
+      font-family: 'Manrope';
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 600;
+      flex: 1;
+      min-width: 0;
+      max-width: 200px;
+      outline: none;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    @media (min-width: 640px) {
+      .title-left input {
+        font-size: 18px;
+        max-width: 250px;
+      }
+    }
+
+    .title-left input:focus {
+      background: var(--bar-bg);
+    }
+
+    .title-left .icon-btn {
+      font-size: 20px;
+      padding: 4px;
+    }
+
+    @media (min-width: 640px) {
+      .title-left .icon-btn {
+        font-size: 24px;
+      }
+    }
+
+    .footer-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .title-center {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    .title-center input {
+      background: transparent;
+      border: none;
+      font-family: 'Manrope';
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 600;
+      text-align: center;
+      min-width: 0;
+      max-width: 200px;
+      outline: none;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    @media (min-width: 640px) {
+      .title-center input {
+        font-size: 18px;
+        max-width: 250px;
+      }
+    }
+
+    .title-center input:focus {
+      background: var(--bar-bg);
+    }
+
+    .title-center .icon-btn {
+      font-size: 20px;
+      padding: 4px;
+    }
+
+    @media (min-width: 640px) {
+      .title-center .icon-btn {
+        font-size: 24px;
+      }
+    }
+
+    .title-center {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    .title-center input {
+      background: transparent;
+      border: none;
+      font-family: 'Manrope';
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 600;
+      text-align: center;
+      min-width: 0;
+      max-width: 200px;
+      outline: none;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    @media (min-width: 640px) {
+      .title-center input {
+        font-size: 18px;
+        max-width: 250px;
+      }
+    }
+
+    .title-center input:focus {
+      background: var(--bar-bg);
+    }
+
+    .title-center .icon-btn {
+      font-size: 20px;
+      padding: 4px;
+    }
+
+    @media (min-width: 640px) {
+      .title-center .icon-btn {
+        font-size: 24px;
+      }
+    }
+
     .action-btn {
       padding: 7px 16px;
       border: 1.5px solid var(--bar-fill);
@@ -556,6 +646,8 @@
       width: 100%;
       max-height: 85vh;
       overflow-y: auto;
+      transform: scale(0.3);
+      transform-origin: top;
     }
 
     @media (min-width: 640px) {
@@ -818,27 +910,17 @@
       display: block;
     }
 
-    /* === Notion Embed Scaling === */
-:root {
-  --ui-scale: 0.75; /* ← change this value */
-}
-
 .card {
-  transform: scale(0.4);
+  transform: scale(0.3);
   transform-origin: top ;
 }
+
 
   </style>
 </head>
 <body>
   <div class="card" id="card">
-    <div class="header-row">
-<div class="title">
-  <span class="icon-btn" id="iconBtn"><i class="ph-bold ph-timer"></i></span>
-  <input type="text" id="titleInput" value="Timer" placeholder="Enter name...">
-</div>
-<span class="settings-btn" id="settingsBtn"><i class="ph-bold ph-gear-six"></i></span>
-    </div>
+
 
     <div class="grid">
       <div class="unit" id="yearUnit">
@@ -874,8 +956,15 @@
     </div>
 
     <div class="footer">
-      <span>Time elapsed</span>
-      <button class="action-btn" id="actionBtn" disabled>Loading...</button>
+      <div class="title-left">
+        <span class="icon-btn" id="iconBtn"><i class="ph-bold ph-timer"></i></span>
+        <input type="text" id="titleInput" value="Timer" placeholder="Enter name...">
+      </div>
+      
+      <div class="footer-right">
+        <span class="settings-btn" id="settingsBtn"><i class="ph-bold ph-gear-six"></i></span>
+        <button class="action-btn" id="actionBtn" disabled>Loading...</button>
+      </div>
     </div>
     <div class="error-message" id="errorMessage"></div>
   </div>
