@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Persistent Notion Timer</title>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jua:wght@200;800&display=swap" rel="stylesheet">
+
   <style>
     :root {
       --bg: #ffffff;
@@ -81,7 +85,7 @@
     .title {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 1px;
       font-size: 18px;
       font-weight: 600;
       flex: 1;
@@ -90,24 +94,28 @@
 
     @media (min-width: 640px) {
       .title {
-        gap: 10px;
+        gap: 1px;
         font-size: 20px;
       }
     }
 
-    .icon-btn {
-      font-size: 22px;
+.icon-btn {
+      font-size: 24px;
       cursor: pointer;
       user-select: none;
-      padding: 4px;
+      padding: 6px;
       border-radius: 8px;
       transition: background 0.2s;
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--button-bg); /* This makes the icon match your theme */
     }
 
     @media (min-width: 640px) {
       .icon-btn {
-        font-size: 24px;
+        font-size: 35px;
       }
     }
 
@@ -116,13 +124,17 @@
     }
 
     .settings-btn {
-      font-size: 18px;
+      font-size: 22px;
       cursor: pointer;
       padding: 6px;
       border-radius: 8px;
       transition: all 0.2s;
       opacity: 0.4;
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--button-bg); /* This makes the gear match your theme */
     }
 
     @media (min-width: 640px) {
@@ -136,22 +148,23 @@
       opacity: 0.8;
     }
 
-    .title input {
+.title input {
       background: transparent;
       border: none;
+      font-family: 'Manrope';
       color: var(--text);
-      font-size: 18px;
-      font-weight: 600;
+      font-size: 20px; /* Slightly larger looks better with bold icons */
+      font-weight: 600; /* Use 700 for a true "Bold" look */
       flex: 1;
       min-width: 0;
       outline: none;
-      padding: 4px 8px;
+      padding: 4px 8px 4px 2px;
       border-radius: 6px;
     }
 
     @media (min-width: 640px) {
       .title input {
-        font-size: 20px;
+        font-size: 25px;
       }
     }
 
@@ -611,6 +624,7 @@
       border-radius: 8px;
       text-align: center;
       transition: background 0.2s;
+      color: var(--button-bg); /* This colors the icons in the selector menu */
     }
 
     @media (min-width: 640px) {
@@ -809,14 +823,19 @@
 <body>
   <div class="card" id="card">
     <div class="header-row">
-      <div class="title">
-        <span class="icon-btn" id="iconBtn">⏱️</span>
-        <input type="text" id="titleInput" value="Timer" placeholder="Enter name...">
-      </div>
-      <span class="settings-btn" id="settingsBtn">⚙️</span>
+<div class="title">
+  <span class="icon-btn" id="iconBtn"><i class="ph-bold ph-timer"></i></span>
+  <input type="text" id="titleInput" value="Timer" placeholder="Enter name...">
+</div>
+<span class="settings-btn" id="settingsBtn"><i class="ph-bold ph-gear-six"></i></span>
     </div>
 
     <div class="grid">
+      <div class="unit" id="yearUnit">
+        <div class="num-container" id="year"></div>
+        <div class="label">years</div>
+        <div class="bar rounded-bar"><div class="fill wave" id="yearBar"></div></div>
+      </div>
       <div class="unit" id="monthUnit">
         <div class="num-container" id="month"></div>
         <div class="label">months</div>
@@ -937,6 +956,11 @@
           <option value="56px">Extra Large</option>
         </select>
       </div>
+      <div class="setting-group">
+        <label>Custom Start Date</label>
+        <input type="datetime-local" id="customStartDate" style="width: 100%; padding: 10px; border: 2px solid var(--bar-bg); border-radius: 8px; background: var(--bg); color: var(--text); margin-bottom: 10px;">
+        <button class="action-btn" id="syncDateBtn" style="width: 100%;">Sync Date to Firebase</button>
+      </div>
     </div>
   </div>
 
@@ -962,9 +986,16 @@
     const timerRef = db.collection("timers").doc("notionTimer");
 
     /* ================================
+   /* ================================
        2. UI STATE
        ================================ */
-    const emojis = ['⏱️','⏰','⌚','🕐','⏳','⌛','💭','🧠','💪','🎯','⭐','🌟','✨','🔥','💎','🏆','❤️','💚','💙','💜','🌈','🦋','🌸','🌺','🌻','🌹','🌷','🍀','🌿','🌱','🎨','🎭','🎪','🎬','🎮','🎯','🎲','🎰','🎻','🎸','🎺','🎷','🎼','🎵','🎶','☀️','🌙','⭐','🌟','💫','✨','🌍','🌎','🌏','🗺️','🧭','⛰️','🏔️','🗻','🌋','🏕️'];
+    const phosphorIcons = [
+      'timer', 'clock', 'hourglass', 'alarm', 
+      'calendar', 'heart', 'star', 'fire', 'lightning', 
+      'trophy', 'target', 'flag', 'leaf', 'tree', 
+      'sun', 'moon', 'cloud', 'drop', 'atom', 
+      'brain', 'barbell', 'coffee', 'briefcase', 'potted-plant'
+    ];
 
     const palettes = [
       { name: 'Purple Dream', barBg: '#e6d9fa', barFill: '#9b5cf6', button: '#9b5cf6' },
@@ -981,7 +1012,7 @@
 
     let state = {
       title: "Timer",
-      icon: "⏱️",
+      icon: '<i class="ph-bold ph-timer"></i>',
       barBg: "#e6d9fa",
       barFill: "#9b5cf6",
       buttonBg: "#9b5cf6",
@@ -990,11 +1021,12 @@
       barShape: "rounded-bar",
       borderRadius: "20px",
       fontSize: "40px",
-      selectedPalette: 0
+      selectedPalette: 0,
+      customDate: "" // Added for the custom date tracker
     };
 
     let startTime = null;
-    let prevValues = { month: '', day: '', hr: '', min: '', sec: '' };
+   let prevValues = { year: '', month: '', day: '', hr: '', min: '', sec: '' };
     let isOperating = false; // Prevent concurrent operations
 
     /* ================================
@@ -1025,13 +1057,20 @@
     /* ================================
        5. EMOJI PICKER
        ================================ */
-    emojis.forEach(emoji => {
+    /* ================================
+       5. ICON PICKER
+       ================================ */
+    phosphorIcons.forEach(iconName => {
       const div = document.createElement('div');
       div.className = 'emoji-item';
-      div.textContent = emoji;
+      // This creates the actual visual icon in the grid
+      div.innerHTML = `<i class="ph-bold ph-${iconName}"></i>`;
+      
       div.onclick = () => {
-        state.icon = emoji;
-        iconBtn.textContent = emoji;
+        // This saves the HTML code for the icon into your settings
+        const iconHtml = `<i class="ph-bold ph-${iconName}"></i>`;
+        state.icon = iconHtml;
+        iconBtn.innerHTML = iconHtml;
         emojiModal.classList.remove('show');
         saveSettings();
       };
@@ -1168,7 +1207,44 @@
       state.title = titleInput.value;
       saveSettings();
     };
+const customDateInput = document.getElementById('customStartDate');
+    const syncDateBtn = document.getElementById('syncDateBtn');
 
+    syncDateBtn.onclick = async () => {
+      const selectedValue = customDateInput.value;
+      if (!selectedValue) {
+        showError("Please select a date first!");
+        return;
+      }
+
+      // Convert selected date to milliseconds for Firebase
+      const newStartTime = new Date(selectedValue).getTime();
+      
+      try {
+        syncDateBtn.disabled = true;
+        syncDateBtn.textContent = "Syncing...";
+        
+        // Update both the startTime and the settings.customDate in Firebase
+        await timerRef.update({
+          startTime: newStartTime,
+          "settings.customDate": selectedValue
+        });
+        
+        // Update local state so the timer changes immediately
+        startTime = newStartTime;
+        state.customDate = selectedValue;
+        
+        syncDateBtn.textContent = "Synced!";
+        setTimeout(() => { 
+          syncDateBtn.textContent = "Sync Date to Firebase"; 
+          syncDateBtn.disabled = false; 
+        }, 2000);
+      } catch (err) {
+        showError("Failed to sync date. Check connection.");
+        syncDateBtn.disabled = false;
+        syncDateBtn.textContent = "Sync Date to Firebase";
+      }
+    };
     /* ================================
        9. SAVE SETTINGS TO FIREBASE
        ================================ */
@@ -1192,7 +1268,7 @@
        ================================ */
     function applySettings() {
       titleInput.value = state.title;
-      iconBtn.textContent = state.icon;
+      iconBtn.innerHTML = state.icon; // Change textContent to innerHTML
       
       applyColors();
       
@@ -1231,6 +1307,11 @@
           c.classList.add('selected');
         }
       });
+
+      // Update the date picker input with the saved date from Firebase
+      if (state.customDate) {
+        document.getElementById('customStartDate').value = state.customDate;
+      }
     }
 
     /* ================================
@@ -1319,8 +1400,8 @@
         // Clear display first for immediate feedback
         document.querySelectorAll('.unit').forEach(u => u.classList.remove('visible'));
         
-        // Clear prev values for clean restart
-        prevValues = { month: '', day: '', hr: '', min: '', sec: '' };
+  // Clear prev values for clean restart
+        prevValues = { year: '', month: '', day: '', hr: '', min: '', sec: '' };
         
         // Save to Firebase
         await timerRef.set({
@@ -1421,7 +1502,7 @@
       }
     }
 
-    function updateDisplay() {
+function updateDisplay() {
       if (!startTime) {
         return;
       }
@@ -1434,32 +1515,49 @@
       const totalHours = Math.floor(totalMinutes / 60);
       const hr = totalHours % 24;
       const totalDays = Math.floor(totalHours / 24);
-      const day = totalDays % 30;
-      const month = Math.floor(totalDays / 30);
+      
+      // Calculations for years, months, and remaining days
+      const year = Math.floor(totalDays / 365);
+      const day = totalDays % 365;
+      const month = Math.floor(day / 30);
+      const remainingDays = day % 30;
 
+      const yearUnit = document.getElementById("yearUnit");
       const monthUnit = document.getElementById("monthUnit");
       const dayUnit = document.getElementById("dayUnit");
       const hrUnit = document.getElementById("hrUnit");
       const minUnit = document.getElementById("minUnit");
       const secUnit = document.getElementById("secUnit");
 
-      if (month > 0) {
+      // Year Display
+      if (year > 0) {
+        yearUnit.classList.add("visible");
+        setNumber("year", year);
+        updateBar("yearBar", 100);
+      } else {
+        yearUnit.classList.remove("visible");
+      }
+
+      // Month Display
+      if (month > 0 || year > 0) {
         monthUnit.classList.add("visible");
         setNumber("month", month);
-        updateBar("monthBar", 100);
+        updateBar("monthBar", (month / 12) * 100);
       } else {
         monthUnit.classList.remove("visible");
       }
 
-      if (day > 0 || month > 0) {
+      // Day Display
+      if (remainingDays > 0 || month > 0 || year > 0) {
         dayUnit.classList.add("visible");
-        setNumber("day", day);
-        updateBar("dayBar", (day / 30) * 100);
+        setNumber("day", remainingDays);
+        updateBar("dayBar", (remainingDays / 30) * 100);
       } else {
         dayUnit.classList.remove("visible");
       }
 
-      if (hr > 0 || day > 0 || month > 0) {
+      // Hour Display
+      if (hr > 0 || remainingDays > 0 || month > 0 || year > 0) {
         hrUnit.classList.add("visible");
         setNumber("hr", hr);
         updateBar("hrBar", (hr / 24) * 100);
@@ -1467,7 +1565,8 @@
         hrUnit.classList.remove("visible");
       }
 
-      if (min > 0 || hr > 0 || day > 0 || month > 0) {
+      // Minute Display
+      if (min > 0 || hr > 0 || remainingDays > 0 || month > 0 || year > 0) {
         minUnit.classList.add("visible");
         setNumber("min", min);
         updateBar("minBar", (min / 60) * 100);
@@ -1475,11 +1574,11 @@
         minUnit.classList.remove("visible");
       }
 
+      // Second Display (Always visible)
       secUnit.classList.add("visible");
       setNumber("sec", sec);
       updateBar("secBar", (sec / 60) * 100);
-    }
-
+    } // <--- THIS BRACKET WAS MISSING
     /* ================================
        13. BUTTON HANDLER
        ================================ */
