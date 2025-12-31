@@ -5,26 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Persistent Notion Timer</title>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;800&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Jua:wght@200;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     :root {
       --bg: #ffffff;
       --card: #f7f7f7;
-      --text: #000000;
-      --subtext: #666;
+      --text: #141414;
+      --subtext: #333333;
       --bar-bg: #e6d9fa;
       --bar-fill: #9b5cf6;
       --button-bg: #9b5cf6;
+      --icon-color: #141414;
     }
 
     @media (prefers-color-scheme: dark) {
       :root {
         --bg: #0b0b0b;
         --card: #121212;
-        --text: #ffffff;
-        --subtext: #aaa;
+        --text: #e9e9e9;
+        --subtext: #f1f1f1;
+        --icon-color: #e9e9e9 :
       }
     }
 
@@ -33,7 +34,6 @@
     body {
       margin: 0;
       background: transparent;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       color: var(--text);
       display: flex;
       justify-content: center;
@@ -44,24 +44,13 @@
     .card {
       background: var(--card);
       border-radius: 20px;
-      padding: 24px 20px 20px;
+      padding: 40px;
       width: 100%;
       max-width: 100%;
-  
+      clip-path: none !important;
     }
 
-    @media (min-width: 640px) {
-      .card {
-        padding: 28px 24px 24px;
-      }
-    }
 
-    @media (min-width: 768px) {
-      .card {
-        padding: 32px 24px 24px;
-        max-width: 100vw;
-      }
-    }
 
     .loading {
       opacity: 0.5;
@@ -70,7 +59,6 @@
 
 
 .icon-btn {
-      font-size: 24px;
       cursor: pointer;
       user-select: none;
       padding: 6px;
@@ -80,14 +68,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--button-bg); /* This makes the icon match your theme */
+      font-size: 34px;
+      color:  var(--button-bg); /* This makes the icon match your theme */ 
     }
 
-    @media (min-width: 640px) {
-      .icon-btn {
-        font-size: 35px;
-      }
-    }
 
     .icon-btn:hover {
       background: var(--bar-bg);
@@ -121,22 +105,24 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-      gap: 16px;
-      margin-bottom: 8px;
+      grid-template-columns: repeat(auto-fit, minmax(0.25vw, 1fr));
+      gap: 26px;
+      margin-bottom: 0px;
     }
 
     @media (min-width: 480px) {
       .grid {
-        grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(0.25vw, 1fr));
+        gap:  26px;
+        margin-bottom: 0px;
       }
     }
 
     @media (min-width: 640px) {
       .grid {
-        grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(0.25vw, 1fr));
+        gap:  26px;
+        margin-bottom: 0px;
       }
     }
 
@@ -150,11 +136,12 @@
     }
 
     .num-container {
-      font-size: 32px;
-      font-weight: 700;
-      line-height: 1;
+      font-family: 'Nunito';
+      font-weight: 900;
+      font-size: 35px;
+      margin-bottom: -7px;;
       display: flex;
-      gap: 2px;
+
     }
 
     @media (min-width: 480px) {
@@ -209,15 +196,10 @@
     }
 
     .label {
-      font-size: 13px;
+      font-family: 'Nunito';
+      font-size: 20px;
+      font-weight: 500;
       color: var(--subtext);
-      margin-top: 4px;
-    }
-
-    @media (min-width: 640px) {
-      .label {
-        font-size: 15px;
-      }
     }
 
     .bar {
@@ -225,51 +207,7 @@
       background: var(--bar-bg);
       border-radius: 10px;
       overflow: hidden;
-      margin-top: 8px;
       position: relative;
-    }
-
-    @media (min-width: 640px) {
-      .bar {
-        height: 20px;
-        margin-top: 10px;
-      }
-    }
-
-    .bar.circle {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: conic-gradient(var(--bar-fill) 0%, var(--bar-bg) 0%);
-      margin: 8px auto 0;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    @media (min-width: 640px) {
-      .bar.circle {
-        width: 70px;
-        height: 70px;
-        margin: 10px auto 0;
-      }
-    }
-
-    .bar.circle::after {
-      content: '';
-      position: absolute;
-      width: 42px;
-      height: 42px;
-      background: var(--card);
-      border-radius: 50%;
-    }
-
-    @media (min-width: 640px) {
-      .bar.circle::after {
-        width: 50px;
-        height: 50px;
-      }
     }
 
     .bar.rounded-bar {
@@ -295,24 +233,38 @@
     }
 
     .bar.square-bar {
-      height: 16px;
-      border-radius: 4px;
+      height: 25px;
+      border-radius: 5px;
     }
 
     @media (min-width: 640px) {
       .bar.square-bar {
-        height: 20px;
+        height: 25px;
       }
     }
 
-    .fill {
-      height: 100%;
-      background: var(--bar-fill);
-      width: 0%;
-      border-radius: 6px;
-      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-    }
+.fill {
+  height: 100%;
+  background: var(--bar-fill);
+  width: 0%;
+  transition: width 1s linear;
+  position: relative;
+}
+
+.bar.rounded-bar .fill {
+  border-radius: 20px;
+}
+
+.bar.thin-bar .fill {
+  border-radius: 4px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.bar.square-bar .fill {
+  border-radius: 5px;
+}
+
 
     .fill.wave {
       background: linear-gradient(90deg, 
@@ -392,8 +344,28 @@
       }
     }
 
+ .bar-percentage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0.8;
+  text-shadow: 0 0 3px var(--card);
+}
+
+@media (min-width: 640px) {
+  .bar-percentage {
+    font-size: 12px;
+  }
+}
+
     .footer {
-      margin-top: 16px;
+      margin-top: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -404,8 +376,8 @@
 
     @media (min-width: 640px) {
       .footer {
-        margin-top: 20px;
-        font-size: 13px;
+    margin-top: 16px;
+    font-size: 13px;
       }
     }
 
@@ -415,8 +387,7 @@
 
     .title-left {
       display: flex;
-      align-items: center;
-      gap: 4px;
+
       flex: 1;
       min-width: 0;
     }
@@ -424,21 +395,20 @@
     .title-left input {
       background: transparent;
       border: none;
-      font-family: 'Manrope';
       color: var(--text);
-      font-size: 16px;
-      font-weight: 600;
       flex: 1;
       min-width: 0;
       max-width: 200px;
       outline: none;
       padding: 4px 8px;
       border-radius: 6px;
+      font-size: 21px;
+      font-family: 'Nunito';
+      font-weight:600;
     }
 
     @media (min-width: 640px) {
       .title-left input {
-        font-size: 18px;
         max-width: 250px;
       }
     }
@@ -447,16 +417,7 @@
       background: var(--bar-bg);
     }
 
-    .title-left .icon-btn {
-      font-size: 20px;
-      padding: 4px;
-    }
 
-    @media (min-width: 640px) {
-      .title-left .icon-btn {
-        font-size: 24px;
-      }
-    }
 
     .footer-right {
       display: flex;
@@ -475,10 +436,7 @@
     .title-center input {
       background: transparent;
       border: none;
-      font-family: 'Manrope';
       color: var(--text);
-      font-size: 16px;
-      font-weight: 600;
       text-align: center;
       min-width: 0;
       max-width: 200px;
@@ -521,7 +479,6 @@
     .title-center input {
       background: transparent;
       border: none;
-      font-family: 'Manrope';
       color: var(--text);
       font-size: 16px;
       font-weight: 600;
@@ -830,59 +787,46 @@
       border-radius: 50%;
     }
 
+.edit-palette-btn {
+  margin-top: 8px;
+  padding: 6px 12px;
+  border: 1.5px solid var(--bar-fill);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--bar-fill);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.edit-palette-btn:hover {
+  background: var(--bar-fill);
+  color: white;
+}
+
+.palette-editor-grid {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.mode-section {
+  padding: 16px;
+  border: 2px solid var(--bar-bg);
+  border-radius: 12px;
+}
+
+.mode-section h3 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: var(--text);
+}
+
     @media (min-width: 640px) {
       .palette-dot {
         width: 20px;
         height: 20px;
-      }
-    }
-
-    .color-inputs {
-      display: grid;
-      gap: 10px;
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid var(--bar-bg);
-    }
-
-    @media (min-width: 640px) {
-      .color-inputs {
-        gap: 12px;
-        margin-top: 16px;
-        padding-top: 16px;
-      }
-    }
-
-    .color-input-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .color-input-row label {
-      flex: 1;
-      font-size: 12px;
-      margin: 0;
-    }
-
-    @media (min-width: 640px) {
-      .color-input-row label {
-        font-size: 13px;
-      }
-    }
-
-    .color-input-row input[type="color"] {
-      width: 45px;
-      height: 32px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    @media (min-width: 640px) {
-      .color-input-row input[type="color"] {
-        width: 50px;
-        height: 35px;
       }
     }
 
@@ -912,20 +856,10 @@
   </style>
 </head>
 <body>
-  <div class="card" id="card">
+  <div class="card" id="card" style="border-radius: 20px;">
 
 
     <div class="grid">
-      <div class="unit" id="yearUnit">
-        <div class="num-container" id="year"></div>
-        <div class="label">years</div>
-        <div class="bar rounded-bar"><div class="fill wave" id="yearBar"></div></div>
-      </div>
-      <div class="unit" id="monthUnit">
-        <div class="num-container" id="month"></div>
-        <div class="label">months</div>
-        <div class="bar rounded-bar"><div class="fill wave" id="monthBar"></div></div>
-      </div>
       <div class="unit" id="dayUnit">
         <div class="num-container" id="day"></div>
         <div class="label">days</div>
@@ -950,12 +884,12 @@
 
     <div class="footer">
       <div class="title-left">
-        <span class="icon-btn" id="iconBtn"><i class="ph-bold ph-timer"></i></span>
+        <span class="icon-btn" id="iconBtn"><i class="ph-fill ph-timer"></i></span>
         <input type="text" id="titleInput" value="Timer" placeholder="Enter name...">
       </div>
       
       <div class="footer-right">
-        <span class="settings-btn" id="settingsBtn"><i class="ph-bold ph-gear-six"></i></span>
+        <span class="settings-btn" id="settingsBtn"><i class="ph-fill ph-gear-six"></i></span>
         <button class="action-btn" id="actionBtn" disabled>Loading...</button>
       </div>
     </div>
@@ -971,7 +905,50 @@
       <div class="emoji-grid" id="emojiGrid"></div>
     </div>
   </div>
-
+<div class="modal" id="paletteEditorModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="paletteEditorTitle">Edit Palette</h2>
+      <span class="close-btn" id="closePaletteEditor">×</span>
+    </div>
+    
+    <div class="palette-editor-grid">
+      <div class="mode-section">
+        <h3>☀️ Light Mode Colors</h3>
+        <div class="color-input-row">
+          <label>Progress Background</label>
+          <input type="color" id="lightBarBg">
+        </div>
+        <div class="color-input-row">
+          <label>Progress Fill</label>
+          <input type="color" id="lightBarFill">
+        </div>
+        <div class="color-input-row">
+          <label>Button</label>
+          <input type="color" id="lightButton">
+        </div>
+      </div>
+      
+      <div class="mode-section">
+        <h3>🌙 Dark Mode Colors</h3>
+        <div class="color-input-row">
+          <label>Progress Background</label>
+          <input type="color" id="darkBarBg">
+        </div>
+        <div class="color-input-row">
+          <label>Progress Fill</label>
+          <input type="color" id="darkBarFill">
+        </div>
+        <div class="color-input-row">
+          <label>Button</label>
+          <input type="color" id="darkButton">
+        </div>
+      </div>
+    </div>
+    
+    <button class="action-btn" id="savePaletteBtn" style="width: 100%; margin-top: 16px;">Save Palette</button>
+  </div>
+</div>
   <div class="modal" id="settingsModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -982,21 +959,6 @@
       <div class="setting-group">
         <label>Color Palette</label>
         <div class="palette-grid" id="paletteGrid"></div>
-        
-        <div class="color-inputs">
-          <div class="color-input-row">
-            <label>Progress Background</label>
-            <input type="color" id="barBgColor" value="#e6d9fa">
-          </div>
-          <div class="color-input-row">
-            <label>Progress Fill</label>
-            <input type="color" id="barFillColor" value="#9b5cf6">
-          </div>
-          <div class="color-input-row">
-            <label>Button</label>
-            <input type="color" id="buttonColor" value="#9b5cf6">
-          </div>
-        </div>
       </div>
 
       <div class="setting-group">
@@ -1011,7 +973,6 @@
         <label>Progress Bar Shape</label>
         <select id="barShape">
           <option value="rounded-bar">Rounded Bar (Default)</option>
-          <option value="circle">Circle</option>
           <option value="thin-bar">Thin Bar</option>
           <option value="square-bar">Square Bar</option>
         </select>
@@ -1029,15 +990,20 @@
         </select>
       </div>
 
-      <div class="setting-group">
-        <label>Card Corner Radius</label>
-        <select id="borderRadius">
-          <option value="20px">Rounded (Default)</option>
-          <option value="8px">Slightly Rounded</option>
-          <option value="0px">Square</option>
-          <option value="30px">Very Rounded</option>
-        </select>
-      </div>
+<div class="setting-group">
+  <label>Card Corner Roundness</label>
+  <select id="cornerPreset">
+    <option value="8">Slightly Rounded</option>
+    <option value="20">Default Rounded</option>
+    <option value="40">Really Rounded</option>
+    <option value="custom">Custom...</option>
+  </select>
+</div>
+
+<div class="setting-group" id="customRadiusGroup" style="display: none;">
+  <label>Custom Radius (0-50px)</label>
+  <input type="number" id="customRadius" min="0" max="50" value="20" style="width: 100%; padding: 10px; border: 2px solid var(--bar-bg); border-radius: 8px; background: var(--bg); color: var(--text);">
+</div>
 
       <div class="setting-group">
         <label>Font Size</label>
@@ -1048,6 +1014,32 @@
           <option value="56px">Extra Large</option>
         </select>
       </div>
+      <div class="setting-group">
+        <label>Visible Time Units</label>
+        <div style="display: grid; gap: 8px; padding: 10px; background: var(--bg); border-radius: 8px; border: 2px solid var(--bar-bg);">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal;">
+            <input type="checkbox" id="showDays" style="width: 18px; height: 18px; cursor: pointer;">
+            <span>Show Days</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal;">
+            <input type="checkbox" id="showHours" style="width: 18px; height: 18px; cursor: pointer;">
+            <span>Show Hours</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal;">
+            <input type="checkbox" id="showMinutes" style="width: 18px; height: 18px; cursor: pointer;">
+            <span>Show Minutes</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal;">
+            <input type="checkbox" id="showSeconds" style="width: 18px; height: 18px; cursor: pointer;">
+            <span>Show Seconds</span>
+          </label>
+  <label>Show Progress Percentage</label>
+  <select id="showPercentage">
+    <option value="false">Hidden (Default)</option>
+    <option value="true">Show Inside Bar</option>
+  </select>
+</div>
+
       <div class="setting-group">
         <label>Custom Start Date</label>
         <input type="datetime-local" id="customStartDate" style="width: 100%; padding: 10px; border: 2px solid var(--bar-bg); border-radius: 8px; background: var(--bg); color: var(--text); margin-bottom: 10px;">
@@ -1089,36 +1081,80 @@
       'brain', 'barbell', 'coffee', 'briefcase', 'potted-plant'
     ];
 
-    const palettes = [
-      { name: 'Purple Dream', barBg: '#e6d9fa', barFill: '#9b5cf6', button: '#9b5cf6' },
-      { name: 'Pink Paradise', barBg: '#ffd3e1', barFill: '#ff6b9d', button: '#ff4081' },
-      { name: 'Ocean Blue', barBg: '#d3e9ff', barFill: '#4a90e2', button: '#2e7dd9' },
-      { name: 'Mint Fresh', barBg: '#d3f5e6', barFill: '#4ecdc4', button: '#3ab8af' },
-      { name: 'Sunset Orange', barBg: '#ffe5d3', barFill: '#ff8a5b', button: '#ff6b35' },
-      { name: 'Golden Hour', barBg: '#fff4d3', barFill: '#ffd93d', button: '#ffc107' },
-      { name: 'Forest Green', barBg: '#d8f3dc', barFill: '#52b788', button: '#40916c' },
-      { name: 'Lavender Dream', barBg: '#e8d9f5', barFill: '#b084cc', button: '#9b59b6' },
-      { name: 'Rose Gold', barBg: '#fde8e9', barFill: '#e8a0a6', button: '#d87c82' },
-      { name: 'Coral Reef', barBg: '#ffe8e1', barFill: '#ff8f7a', button: '#ff6b54' }
-    ];
+const palettes = [
+  { 
+    name: 'Purple Dream', 
+    light: { barBg: '#e6d9fa', barFill: '#9b5cf6', button: '#9b5cf6' },
+    dark: { barBg: '#4a1f7a', barFill: '#b084cc', button: '#b084cc' }
+  },
+  { 
+    name: 'Pink Paradise', 
+    light: { barBg: '#ffd3e1', barFill: '#ff6b9d', button: '#ff4081' },
+    dark: { barBg: '#6b2d41', barFill: '#ff8fa3', button: '#ff6b8a' }
+  },
+  { 
+    name: 'Ocean Blue', 
+    light: { barBg: '#d3e9ff', barFill: '#4a90e2', button: '#2e7dd9' },
+    dark: { barBg: '#1a3a5c', barFill: '#5da3f0', button: '#4a90e2' }
+  },
+  { 
+    name: 'Mint Fresh', 
+    light: { barBg: '#d3f5e6', barFill: '#4ecdc4', button: '#3ab8af' },
+    dark: { barBg: '#1f4a42', barFill: '#5eddd4', button: '#4ecdc4' }
+  },
+  { 
+    name: 'Sunset Orange', 
+    light: { barBg: '#ffe5d3', barFill: '#ff8a5b', button: '#ff6b35' },
+    dark: { barBg: '#5c3320', barFill: '#ff9a6b', button: '#ff8a5b' }
+  },
+  { 
+    name: 'Golden Hour', 
+    light: { barBg: '#fff4d3', barFill: '#ffd93d', button: '#ffc107' },
+    dark: { barBg: '#5c4f1a', barFill: '#ffe74d', button: '#ffd93d' }
+  },
+  { 
+    name: 'Forest Green', 
+    light: { barBg: '#d8f3dc', barFill: '#52b788', button: '#40916c' },
+    dark: { barBg: '#1f3d2e', barFill: '#62c798', button: '#52b788' }
+  },
+  { 
+    name: 'Lavender Dream', 
+    light: { barBg: '#e8d9f5', barFill: '#b084cc', button: '#9b59b6' },
+    dark: { barBg: '#3d2952', barFill: '#c094dc', button: '#b084cc' }
+  },
+  { 
+    name: 'Rose Gold', 
+    light: { barBg: '#fde8e9', barFill: '#e8a0a6', button: '#d87c82' },
+    dark: { barBg: '#5c2e32', barFill: '#f8b0b6', button: '#e8a0a6' }
+  },
+  { 
+    name: 'Coral Reef', 
+    light: { barBg: '#ffe8e1', barFill: '#ff8f7a', button: '#ff6b54' },
+    dark: { barBg: '#5c2e26', barFill: '#ff9f8a', button: '#ff8f7a' }
+  }
+];
 
-    let state = {
-      title: "Timer",
-      icon: '<i class="ph-bold ph-timer"></i>',
-      barBg: "#e6d9fa",
-      barFill: "#9b5cf6",
-      buttonBg: "#9b5cf6",
-      numberAnim: "flip",
-      barStyle: "wave",
-      barShape: "rounded-bar",
-      borderRadius: "20px",
-      fontSize: "40px",
-      selectedPalette: 0,
-      customDate: "" // Added for the custom date tracker
-    };
-
+let state = {
+  title: "Timer",
+  icon: '<i class="ph-fill ph-timer"></i>',
+  selectedPalette: 0,
+  palettes: palettes, // Store customized palettes
+  numberAnim: "flip",
+  barStyle: "wave",
+  barShape: "rounded-bar",
+  cornerRadius: 20,
+  fontSize: "40px",
+  customDate: "",
+  showPercentage: false,
+  visibleUnits: {
+    day: true,
+    hr: true,
+    min: true,
+    sec: true
+  }
+};
     let startTime = null;
-   let prevValues = { year: '', month: '', day: '', hr: '', min: '', sec: '' };
+   let prevValues = { day: '', hr: '', min: '', sec: '' };
     let isOperating = false; // Prevent concurrent operations
 
     /* ================================
@@ -1134,6 +1170,21 @@
     const emojiGrid = document.getElementById("emojiGrid");
     const paletteGrid = document.getElementById("paletteGrid");
     const errorMessage = document.getElementById("errorMessage");
+
+
+    /* ================================
+   4.5. DARK MODE DETECTION
+   ================================ */
+function isDarkMode() {
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+function getCurrentPaletteColors() {
+  const palette = state.palettes[state.selectedPalette];
+  const mode = isDarkMode() ? 'dark' : 'light';
+  return palette[mode];
+}
+
 
     /* ================================
        4. ERROR HANDLING
@@ -1156,11 +1207,11 @@
       const div = document.createElement('div');
       div.className = 'emoji-item';
       // This creates the actual visual icon in the grid
-      div.innerHTML = `<i class="ph-bold ph-${iconName}"></i>`;
+      div.innerHTML = `<i class="ph-fill ph-${iconName}"></i>`;
       
       div.onclick = () => {
         // This saves the HTML code for the icon into your settings
-        const iconHtml = `<i class="ph-bold ph-${iconName}"></i>`;
+        const iconHtml = `<i class="ph-fill ph-${iconName}"></i>`;
         state.icon = iconHtml;
         iconBtn.innerHTML = iconHtml;
         emojiModal.classList.remove('show');
@@ -1172,39 +1223,48 @@
     /* ================================
        6. PALETTE PICKER
        ================================ */
-    palettes.forEach((palette, idx) => {
-      const div = document.createElement('div');
-      div.className = 'palette-card';
-      if (idx === 0) div.classList.add('selected');
-      div.style.background = palette.barBg;
-      div.innerHTML = `
-        <div class="palette-name" style="color: ${palette.button}">${palette.name}</div>
-        <div class="palette-colors">
-          <div class="palette-dot" style="background: ${palette.barBg}"></div>
-          <div class="palette-dot" style="background: ${palette.barFill}"></div>
-          <div class="palette-dot" style="background: ${palette.button}"></div>
-        </div>
-      `;
-      div.onclick = () => {
-        state.selectedPalette = idx;
-        state.barBg = palette.barBg;
-        state.barFill = palette.barFill;
-        state.buttonBg = palette.button;
-        
-        applyColors();
-        
-        document.getElementById('barBgColor').value = palette.barBg;
-        document.getElementById('barFillColor').value = palette.barFill;
-        document.getElementById('buttonColor').value = palette.button;
-        
-        document.querySelectorAll('.palette-card').forEach(c => c.classList.remove('selected'));
-        div.classList.add('selected');
-        
-        saveSettings();
-      };
-      paletteGrid.appendChild(div);
-    });
+function renderPaletteGrid() {
+  paletteGrid.innerHTML = ''; // Clear existing
+  
+  state.palettes.forEach((palette, idx) => {
+    const div = document.createElement('div');
+    div.className = 'palette-card';
+    if (idx === state.selectedPalette) div.classList.add('selected');
+    
+    const colors = getCurrentPaletteColors();
+    div.style.background = colors.barBg;
+    
+    div.innerHTML = `
+      <div class="palette-name" style="color: ${colors.button}">${palette.name}</div>
+      <div class="palette-colors">
+        <div class="palette-dot" style="background: ${colors.barBg}"></div>
+        <div class="palette-dot" style="background: ${colors.barFill}"></div>
+        <div class="palette-dot" style="background: ${colors.button}"></div>
+      </div>
+      <button class="edit-palette-btn" data-index="${idx}">✎ Edit Colors</button>
+    `;
+    
+    div.onclick = (e) => {
+      if (e.target.classList.contains('edit-palette-btn')) {
+        e.stopPropagation();
+        openPaletteEditor(idx);
+        return;
+      }
+      
+      state.selectedPalette = idx;
+      applyCurrentPalette();
+      
+      document.querySelectorAll('.palette-card').forEach(c => c.classList.remove('selected'));
+      div.classList.add('selected');
+      
+      saveSettings();
+    };
+    
+    paletteGrid.appendChild(div);
+  });
+}
 
+renderPaletteGrid();
     /* ================================
        7. MODAL HANDLERS
        ================================ */
@@ -1223,75 +1283,187 @@
     /* ================================
        8. SETTINGS HANDLERS
        ================================ */
-    const barBgColor = document.getElementById('barBgColor');
-    const barFillColor = document.getElementById('barFillColor');
-    const buttonColor = document.getElementById('buttonColor');
+/* ================================
+       8. SETTINGS HANDLERS
+       ================================ */
     const numberAnim = document.getElementById('numberAnim');
     const barStyle = document.getElementById('barStyle');
     const barShape = document.getElementById('barShape');
-    const borderRadius = document.getElementById('borderRadius');
     const fontSize = document.getElementById('fontSize');
+    
+    const paletteEditorModal = document.getElementById('paletteEditorModal');
+    const paletteEditorTitle = document.getElementById('paletteEditorTitle');
+    const closePaletteEditor = document.getElementById('closePaletteEditor');
+    const savePaletteBtn = document.getElementById('savePaletteBtn');
+    
+    let editingPaletteIndex = null;
 
-    function applyColors() {
-      document.documentElement.style.setProperty('--bar-bg', state.barBg);
-      document.documentElement.style.setProperty('--bar-fill', state.barFill);
-      document.documentElement.style.setProperty('--button-bg', state.buttonBg);
+    function applyCurrentPalette() {
+      const colors = getCurrentPaletteColors();
+      document.documentElement.style.setProperty('--bar-bg', colors.barBg);
+      document.documentElement.style.setProperty('--bar-fill', colors.barFill);
+      document.documentElement.style.setProperty('--button-bg', colors.button);
     }
-
-    barBgColor.oninput = (e) => {
-      state.barBg = e.target.value;
-      applyColors();
-      saveSettings();
+    
+    function openPaletteEditor(index) {
+      editingPaletteIndex = index;
+      const palette = state.palettes[index];
+      
+      paletteEditorTitle.textContent = `Edit ${palette.name}`;
+      
+      // Load light mode colors
+      document.getElementById('lightBarBg').value = palette.light.barBg;
+      document.getElementById('lightBarFill').value = palette.light.barFill;
+      document.getElementById('lightButton').value = palette.light.button;
+      
+      // Load dark mode colors
+      document.getElementById('darkBarBg').value = palette.dark.barBg;
+      document.getElementById('darkBarFill').value = palette.dark.barFill;
+      document.getElementById('darkButton').value = palette.dark.button;
+      
+      paletteEditorModal.classList.add('show');
+    }
+    
+    closePaletteEditor.onclick = () => paletteEditorModal.classList.remove('show');
+    paletteEditorModal.onclick = (e) => {
+      if (e.target === paletteEditorModal) paletteEditorModal.classList.remove('show');
     };
-
-    barFillColor.oninput = (e) => {
-      state.barFill = e.target.value;
-      applyColors();
+    
+    savePaletteBtn.onclick = () => {
+      if (editingPaletteIndex === null) return;
+      
+      const palette = state.palettes[editingPaletteIndex];
+      
+      // Save light mode colors
+      palette.light.barBg = document.getElementById('lightBarBg').value;
+      palette.light.barFill = document.getElementById('lightBarFill').value;
+      palette.light.button = document.getElementById('lightButton').value;
+      
+      // Save dark mode colors
+      palette.dark.barBg = document.getElementById('darkBarBg').value;
+      palette.dark.barFill = document.getElementById('darkBarFill').value;
+      palette.dark.button = document.getElementById('darkButton').value;
+      
+      // If this is the currently selected palette, apply changes immediately
+      if (editingPaletteIndex === state.selectedPalette) {
+        applyCurrentPalette();
+      }
+      
+      renderPaletteGrid();
       saveSettings();
+      paletteEditorModal.classList.remove('show');
     };
-
-    buttonColor.oninput = (e) => {
-      state.buttonBg = e.target.value;
-      applyColors();
-      saveSettings();
-    };
-
+    
+    // Listen for system theme changes
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        applyCurrentPalette();
+        renderPaletteGrid();
+      });
+    }
     numberAnim.onchange = (e) => {
       state.numberAnim = e.target.value;
       saveSettings();
     };
     
-    barStyle.onchange = (e) => {
-      state.barStyle = e.target.value;
-      document.querySelectorAll('.fill').forEach(fill => {
-        fill.className = 'fill';
-        if (e.target.value !== 'smooth') fill.classList.add(e.target.value);
-      });
-      saveSettings();
-    };
+barStyle.onchange = (e) => {
+  state.barStyle = e.target.value;
+  document.querySelectorAll('.fill').forEach(fill => {
+    fill.className = 'fill';
+    if (e.target.value !== 'smooth') fill.classList.add(e.target.value);
+  });
+  saveSettings();
+};
 
-    barShape.onchange = (e) => {
-      state.barShape = e.target.value;
-      document.querySelectorAll('.bar').forEach(bar => {
-        bar.className = 'bar';
-        bar.classList.add(e.target.value);
-        const fill = bar.querySelector('.fill');
-        if (fill && state.barStyle !== 'smooth') {
-          fill.classList.add(state.barStyle);
-        }
-      });
-      saveSettings();
-    };
+barShape.onchange = (e) => {
+  state.barShape = e.target.value;
+  
+  // Reset all bars and remove inline styles
+  document.querySelectorAll('.bar').forEach(bar => {
+    // Clear inline styles that might be stuck
+    bar.style.background = '';
+    
+    // Reset classes
+    bar.className = 'bar';
+    bar.classList.add(e.target.value);
+    
+    // Reset fill element
+    const fill = bar.querySelector('.fill');
+    if (fill) {
+      fill.className = 'fill';
+      fill.style.width = ''; // Clear any stuck width
+      
+      // Reapply the bar style
+      if (state.barStyle !== 'smooth') {
+        fill.classList.add(state.barStyle);
+      }
+    }
+  });
+  
+  saveSettings();
+};
 
-    borderRadius.onchange = (e) => {
-      state.borderRadius = e.target.value;
-      card.style.borderRadius = e.target.value;
-      saveSettings();
-    };
 
+const cornerPreset = document.getElementById('cornerPreset');
+const customRadius = document.getElementById('customRadius');
+const customRadiusGroup = document.getElementById('customRadiusGroup');
+
+cornerPreset.onchange = (e) => {
+  if (e.target.value === 'custom') {
+    customRadiusGroup.style.display = 'block';
+    state.cornerRadius = parseInt(customRadius.value);
+  } else {
+    customRadiusGroup.style.display = 'none';
+    state.cornerRadius = parseInt(e.target.value);
+  }
+  applyCornerShape();
+  saveSettings();
+};
+
+customRadius.oninput = (e) => {
+  state.cornerRadius = parseInt(e.target.value);
+  applyCornerShape();
+  saveSettings();
+};
+
+function applyCornerShape() {
+  card.style.borderRadius = state.cornerRadius + 'px';
+}
     fontSize.onchange = (e) => {
       state.fontSize = e.target.value;
       document.querySelectorAll('.num-container').forEach(num => num.style.fontSize = e.target.value);
+      saveSettings();
+    };
+const showPercentage = document.getElementById('showPercentage');
+
+showPercentage.onchange = (e) => {
+  state.showPercentage = e.target.value === 'true';
+  saveSettings();
+};
+
+// Column visibility controls
+    const showDays = document.getElementById('showDays');
+    const showHours = document.getElementById('showHours');
+    const showMinutes = document.getElementById('showMinutes');
+    const showSeconds = document.getElementById('showSeconds');
+    
+    showDays.onchange = (e) => {
+      state.visibleUnits.day = e.target.checked;
+      saveSettings();
+    };
+    
+    showHours.onchange = (e) => {
+      state.visibleUnits.hr = e.target.checked;
+      saveSettings();
+    };
+    
+    showMinutes.onchange = (e) => {
+      state.visibleUnits.min = e.target.checked;
+      saveSettings();
+    };
+    
+    showSeconds.onchange = (e) => {
+      state.visibleUnits.sec = e.target.checked;
       saveSettings();
     };
 
@@ -1358,36 +1530,73 @@ const customDateInput = document.getElementById('customStartDate');
     /* ================================
        10. APPLY SETTINGS TO UI
        ================================ */
-    function applySettings() {
-      titleInput.value = state.title;
-      iconBtn.innerHTML = state.icon; // Change textContent to innerHTML
+function applySettings() {
+  titleInput.value = state.title;
+  iconBtn.innerHTML = state.icon;
+  
+  // Apply the current palette colors
+  applyCurrentPalette();
       
-      applyColors();
-      
-      barBgColor.value = state.barBg;
-      barFillColor.value = state.barFill;
-      buttonColor.value = state.buttonBg;
-      
-      numberAnim.value = state.numberAnim;
-      barStyle.value = state.barStyle;
-      barShape.value = state.barShape;
-      borderRadius.value = state.borderRadius;
-      fontSize.value = state.fontSize;
-      
+numberAnim.value = state.numberAnim;
+barStyle.value = state.barStyle;
+barShape.value = state.barShape;
+// Set corner radius
+if ([8, 20, 40].includes(state.cornerRadius)) {
+  cornerPreset.value = state.cornerRadius;
+  customRadiusGroup.style.display = 'none';
+} else {
+  cornerPreset.value = 'custom';
+  customRadius.value = state.cornerRadius;
+  customRadiusGroup.style.display = 'block';
+}
+applyCornerShape();
+fontSize.value = state.fontSize;
+showPercentage.value = state.showPercentage ? 'true' : 'false';
+     
+// Apply column visibility settings
+      if (state.visibleUnits) {
+        document.getElementById('showDays').checked = state.visibleUnits.day;
+        document.getElementById('showHours').checked = state.visibleUnits.hr;
+        document.getElementById('showMinutes').checked = state.visibleUnits.min;
+        document.getElementById('showSeconds').checked = state.visibleUnits.sec;
+      }
+
       // Apply bar style
       document.querySelectorAll('.fill').forEach(fill => {
         fill.className = 'fill';
         if (state.barStyle !== 'smooth') fill.classList.add(state.barStyle);
       });
       
-      // Apply bar shape
-      document.querySelectorAll('.bar').forEach(bar => {
-        bar.className = 'bar';
-        bar.classList.add(state.barShape);
-      });
+// Apply bar style
+document.querySelectorAll('.fill').forEach(fill => {
+  fill.className = 'fill';
+  if (state.barStyle !== 'smooth') fill.classList.add(state.barStyle);
+});
+
+// Apply bar shape
+document.querySelectorAll('.bar').forEach(bar => {
+  // Clear any inline styles first
+  bar.style.background = '';
+  
+  // Reset bar classes
+  bar.className = 'bar';
+  bar.classList.add(state.barShape);
+  
+  // Reset fill element
+  const fill = bar.querySelector('.fill');
+  if (fill) {
+    fill.className = 'fill';
+    fill.style.width = '';
+    
+    // Reapply bar style to fill
+    if (state.barStyle !== 'smooth') {
+      fill.classList.add(state.barStyle);
+    }
+  }
+});
       
-      // Apply border radius
-      card.style.borderRadius = state.borderRadius;
+      // Apply corner shape
+      applyCornerShape();
       
       // Apply font size
       document.querySelectorAll('.num-container').forEach(num => num.style.fontSize = state.fontSize);
@@ -1489,11 +1698,23 @@ const customDateInput = document.getElementById('customStartDate');
       actionBtn.disabled = true;
       
       try {
-        // Clear display first for immediate feedback
-        document.querySelectorAll('.unit').forEach(u => u.classList.remove('visible'));
-        
+  // Clear display first for immediate feedback
+  document.querySelectorAll('.unit').forEach(u => u.classList.remove('visible'));
+  
+  // Clear all numbers and bars completely
+  setNumber("day", 0);
+  setNumber("hr", 0);
+  setNumber("min", 0);
+  setNumber("sec", 0);
+  
+  // Reset all progress bars to 0%
+  updateBar("dayBar", 0);
+  updateBar("hrBar", 0);
+  updateBar("minBar", 0);
+  updateBar("secBar", 0);
+  
   // Clear prev values for clean restart
-        prevValues = { year: '', month: '', day: '', hr: '', min: '', sec: '' };
+  prevValues = { day: '', hr: '', min: '', sec: '' };
         
         // Save to Firebase
         await timerRef.set({
@@ -1581,117 +1802,140 @@ const customDateInput = document.getElementById('customStartDate');
       prevValues[containerId] = newValue;
     }
 
-    function updateBar(barId, percentage) {
-      const bar = document.getElementById(barId);
-      if (!bar) return;
-      
-      const parentBar = bar.parentElement;
-      
-      if (parentBar.classList.contains('circle')) {
-        parentBar.style.background = `conic-gradient(var(--bar-fill) ${percentage}%, var(--bar-bg) ${percentage}%)`;
-      } else {
-        bar.style.width = percentage + "%";
-      }
+function updateBar(barId, percentage) {
+  const bar = document.getElementById(barId);
+  if (!bar) return;
+  
+  const parentBar = bar.parentElement;
+  
+  // Seconds bar needs instant updates for smooth millisecond animation
+  // Other bars use smooth transitions for seamless filling and resetting
+  if (barId === 'secBar') {
+    bar.style.transition = 'none';
+  } else {
+    bar.style.transition = '';
+  }
+  
+// Clear any stuck inline styles and update fill width
+parentBar.style.background = '';
+bar.style.width = percentage + "%";
+
+  // Handle percentage display
+  let percentSpan = parentBar.querySelector('.bar-percentage');
+  
+  if (state.showPercentage) {
+    // Create percentage span if it doesn't exist
+    if (!percentSpan) {
+      percentSpan = document.createElement('span');
+      percentSpan.className = 'bar-percentage';
+      parentBar.appendChild(percentSpan);
     }
+    // Update percentage text
+    percentSpan.textContent = Math.round(percentage) + '%';
+  } else {
+    // Remove percentage span if it exists
+    if (percentSpan) {
+      percentSpan.remove();
+    }
+  }
+}
 
 function updateDisplay() {
       if (!startTime) {
         return;
       }
 
-      const diff = Math.max(0, Math.floor((Date.now() - startTime) / 1000));
+      // Get total milliseconds for subsecond precision
+      const totalMs = Math.max(0, Date.now() - startTime);
+      const diff = Math.floor(totalMs / 1000); // Total seconds
 
       const sec = diff % 60;
       const totalMinutes = Math.floor(diff / 60);
       const min = totalMinutes % 60;
       const totalHours = Math.floor(totalMinutes / 60);
       const hr = totalHours % 24;
-      const totalDays = Math.floor(totalHours / 24);
-      
-      // Calculations for years, months, and remaining days
-      const year = Math.floor(totalDays / 365);
-      const day = totalDays % 365;
-      const month = Math.floor(day / 30);
-      const remainingDays = day % 30;
+      const day = Math.floor(totalHours / 24);
 
-      const yearUnit = document.getElementById("yearUnit");
-      const monthUnit = document.getElementById("monthUnit");
+      // Get milliseconds within current second for smooth second bar animation
+      const msInCurrentSecond = totalMs % 1000;
+
       const dayUnit = document.getElementById("dayUnit");
       const hrUnit = document.getElementById("hrUnit");
       const minUnit = document.getElementById("minUnit");
       const secUnit = document.getElementById("secUnit");
 
-      // NEW CODE: Determine which units should be visible
+      // Use the visibility settings from state instead of automatic detection
       const unitsToShow = [];
       
-      if (year > 0) unitsToShow.push('year');
-      if (month > 0 || year > 0) unitsToShow.push('month');
-      if (remainingDays > 0 || month > 0 || year > 0) unitsToShow.push('day');
-      if (hr > 0 || remainingDays > 0 || month > 0 || year > 0) unitsToShow.push('hr');
-      if (min > 0 || hr > 0 || remainingDays > 0 || month > 0 || year > 0) unitsToShow.push('min');
-      unitsToShow.push('sec'); // Always include seconds
+      // Check user preferences for visibility
+      if (state.visibleUnits && state.visibleUnits.day) {
+        unitsToShow.push('day');
+      }
+      if (state.visibleUnits && state.visibleUnits.hr) {
+        unitsToShow.push('hr');
+      }
+      if (state.visibleUnits && state.visibleUnits.min) {
+        unitsToShow.push('min');
+      }
+      if (state.visibleUnits && state.visibleUnits.sec) {
+        unitsToShow.push('sec');
+      }
       
-      // NEW CODE: If more than 4 units, remove the smallest ones
-      const maxColumns = 4;
-      if (unitsToShow.length > maxColumns) {
-        // Remove from the end (smallest units)
-        unitsToShow.splice(maxColumns);
+      // If no units are checked, default to showing seconds
+      if (unitsToShow.length === 0) {
+        unitsToShow.push('sec');
       }
 
-      // Year Display
-      if (unitsToShow.includes('year')) {
-        yearUnit.classList.add("visible");
-        setNumber("year", year);
-        updateBar("yearBar", 100);
-      } else {
-        yearUnit.classList.remove("visible");
-      }
-
-      // Month Display
-      if (unitsToShow.includes('month')) {
-        monthUnit.classList.add("visible");
-        setNumber("month", month);
-        updateBar("monthBar", (month / 12) * 100);
-      } else {
-        monthUnit.classList.remove("visible");
-      }
-
-      // Day Display
+      // Day Display - Number shows days, bar shows progress through current 24-hour cycle
       if (unitsToShow.includes('day')) {
         dayUnit.classList.add("visible");
-        setNumber("day", remainingDays);
-        updateBar("dayBar", (remainingDays / 30) * 100);
+        setNumber("day", day);
+        // Bar fills based on hours (0-24 hours = 0-100%)
+        updateBar("dayBar", (hr / 24) * 100);
       } else {
         dayUnit.classList.remove("visible");
       }
-
-      // Hour Display
+      
+      // Hour Display - Number shows hours, bar shows progress through current 60-minute cycle
       if (unitsToShow.includes('hr')) {
         hrUnit.classList.add("visible");
         setNumber("hr", hr);
-        updateBar("hrBar", (hr / 24) * 100);
+        // Bar fills based on minutes (0-60 minutes = 0-100%)
+        updateBar("hrBar", (min / 60) * 100);
       } else {
         hrUnit.classList.remove("visible");
       }
 
-      // Minute Display
+      // Minute Display - Number shows minutes, bar shows progress through current 60-second cycle
       if (unitsToShow.includes('min')) {
         minUnit.classList.add("visible");
         setNumber("min", min);
-        updateBar("minBar", (min / 60) * 100);
+        // Bar fills based on seconds (0-60 seconds = 0-100%)
+        updateBar("minBar", (sec / 60) * 100);
       } else {
         minUnit.classList.remove("visible");
       }
 
-      // Second Display
+      // Second Display - Number shows seconds, bar shows progress through current 1000ms cycle
       if (unitsToShow.includes('sec')) {
         secUnit.classList.add("visible");
         setNumber("sec", sec);
-        updateBar("secBar", (sec / 60) * 100);
+        // Bar fills based on milliseconds (0-1000ms = 0-100%) for smooth animation
+        updateBar("secBar", (msInCurrentSecond / 1000) * 100);
       } else {
         secUnit.classList.remove("visible");
       }
     }
+    /* ================================
+       13. BUTTON CLICK HANDLER
+       ================================ */
+    actionBtn.onclick = () => {
+      if (startTime === null) {
+        startTimer();
+      } else {
+        resetTimer();
+      }
+    };
     /* ================================
        14. INIT
        ================================ */
