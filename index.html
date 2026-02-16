@@ -32,9 +32,7 @@
 }
 
     * { box-sizing: border-box; }
-html {
-  background: transparent;
-}
+
 html, body {
   margin: 0;
   padding: 0;
@@ -1876,6 +1874,23 @@ function updateDisplay() {
     }
     
     loop();
+
+    (function(){
+  function setBodyBackground(){
+    try{
+      const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.body.style.background = isDark ? '#191919' : '#ffffff';
+    } catch(e) {
+      document.body.style.background = '#ffffff';
+    }
+  }
+  if(window.matchMedia){
+    window.matchMedia('(prefers-color-scheme: dark)').addListener(setBodyBackground);
+  }
+  setBodyBackground();
+})();
+
+    
   </script>
 </body>
 </html>
