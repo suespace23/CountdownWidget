@@ -9,6 +9,8 @@
 
   <style>
 :root {
+  --bg: #ffffff;
+  --card: #f7f7f7;
   --text: #141414;
   --subtext: #333333;
   --bar-bg: #e6d9fa;
@@ -33,14 +35,11 @@
 
     * { box-sizing: border-box; }
 
-html, body {
+body {
   margin: 0;
-  padding: 0;
   background: transparent;
-  height: auto;
-  display: block;
+  color: var(--text);
 }
-
 .card {
   background: var(--card);
   border-radius: 20px;
@@ -511,6 +510,9 @@ html, body {
       z-index: 1000;
       padding: 16px;
     }
+.modal#paletteEditorModal {
+  z-index: 1100;  /* Higher than the settings modal */
+}
 
     @media (min-width: 640px) {
       .modal {
@@ -1158,7 +1160,8 @@ function renderPaletteGrid() {
     div.className = 'palette-card';
     if (idx === state.selectedPalette) div.classList.add('selected');
     
-    const colors = getCurrentPaletteColors();
+    const currentMode = isDarkMode() ? 'dark' : 'light';
+const colors = palette[currentMode];
     div.style.background = colors.barBg;
     
     div.innerHTML = `
@@ -1875,8 +1878,22 @@ function updateDisplay() {
     
     loop();
 
+    (function(){
+  function setBodyBackground(){
+    try{
+      const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.body.style.background = isDark ? '#191919' : '#ffffff';
+    } catch(e) {
+      document.body.style.background = '#ffffff';
+    }
+  }
+  if(window.matchMedia){
+    window.matchMedia('(prefers-color-scheme: dark)').addListener(setBodyBackground);
+  }
+  setBodyBackground();
+})();
 
-    
+
   </script>
 </body>
 </html>
